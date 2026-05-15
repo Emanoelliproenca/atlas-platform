@@ -1,0 +1,185 @@
+<section class="repasse-shell">
+  <header class="repasse-header">
+    <div>
+      <p class="repasse-eyebrow">Comunicados operacionais</p>
+      <h1>Repasse</h1>
+      <p>Handoffs, orientacoes e atualizacoes para suporte e operacao.</p>
+    </div>
+
+    @if (ehAdmin()) {
+      <button type="button" class="repasse-action" (click)="abrirNovoRepasse()">+ Novo repasse</button>
+    }
+  </header>
+
+  <div class="repasse-filters">
+    @for (filtro of filtros; track filtro) {
+      <button
+        type="button"
+        class="filter-chip"
+        [class.active]="filtroAtual() === filtro"
+        (click)="selecionarFiltro(filtro)"
+      >
+        {{ filtro }}
+      </button>
+    }
+  </div>
+
+  @if (carregando()) {
+    <article class="repasse-state">Carregando repasses...</article>
+  } @else if (erro()) {
+    <article class="repasse-state error">{{ erro() }}</article>
+  } @else {
+    @if (repasseFixado(); as fixado) {
+      <article class="repasse-card repasse-card-pinned">
+        <div class="repasse-card-top">
+          <span class="repasse-tag repasse-tag-pinned">✦ Fixado</span>
+          @if (ehAdmin()) {
+            <div class="repasse-admin-actions">
+              <button type="button" class="link-action" (click)="editarRepasse(fixado)">Editar</button>
+              <button type="button" class="link-action" (click)="alternarFixado(fixado)">Desfixar</button>
+              <button type="button" class="link-action danger" (click)="excluirRepasse(fixado.id)">Excluir</button>
+            </div>
+          }
+        </div>
+
+        <h2>{{ fixado.titulo }}</h2>
+        <p class="repasse-content">{{ fixado.conteudo }}</p>
+        <div class="repasse-info-row">
+          <p class="repasse-category">{{ fixado.categoria }}</p>
+          <span class="priority-badge">{{ fixado.prioridade }}</span>
+        </div>
+
+        @if (fixado.anexoNome) {
+          <button type="button" class="attachment-row" (click)="abrirAnexo(fixado)">
+            <span>⌁</span>
+            <span>Anexo disponivel</span>
+          </button>
+        }
+
+        <div class="repasse-meta">
+          <span>{{ fixado.criadoEm ? (fixado.criadoEm | date: 'dd/MM/yyyy HH:mm') : 'Sem data informada' }}</span>
+          <span>{{ fixado.autor }}</span>
+        </div>
+      </article>
+    }
+
+    <section class="repasse-list">
+      @for (item of listaRepasses(); track trackById($index, item)) {
+        <article class="repasse-card">
+          <div class="repasse-card-top">
+            <span class="repasse-tag">{{ tagLabel(item) }}</span>
+            @if (ehAdmin()) {
+              <div class="repasse-admin-actions">
+                <button type="button" class="link-action" (click)="editarRepasse(item)">Editar</button>
+                <button type="button" class="link-action" (click)="alternarFixado(item)">
+                  {{ item.fixado ? 'Desfixar' : 'Fixar' }}
+                </button>
+                <button type="button" class="link-action danger" (click)="excluirRepasse(item.id)">Excluir</button>
+              </div>
+            }
+          </div>
+
+        <h2>{{ item.titulo }}</h2>
+        <p class="repasse-content">{{ item.conteudo }}</p>
+          <div class="repasse-info-row">
+            <p class="repasse-category">{{ item.categoria }}</p>
+            <span class="priority-badge">{{ item.prioridade }}</span>
+          </div>
+
+          @if (item.anexoNome) {
+            <button type="button" class="attachment-row" (click)="abrirAnexo(item)">
+              <span>⌁</span>
+              <span>Anexo disponivel</span>
+            </button>
+          }
+
+          <div class="repasse-meta">
+            <span>{{ item.criadoEm ? (item.criadoEm | date: 'dd/MM/yyyy HH:mm') : 'Sem data informada' }}</span>
+            <span>{{ item.autor }}</span>
+          </div>
+        </article>
+      } @empty {
+        <article class="repasse-state">Nenhum repasse encontrado.</article>
+      }
+    </section>
+  }
+</section>
+
+@if (ehAdmin() && modalAberto()) {
+  <div class="repasse-modal-backdrop" (click)="fecharModal()">
+    <section class="repasse-modal" (click)="$event.stopPropagation()">
+      <header class="repasse-modal-header">
+        <div>
+          <h2>{{ editandoId() == null ? 'Novo repasse' : 'Editar repasse' }}</h2>
+          <p>Comunicado operacional para a equipe de suporte</p>
+        </div>
+        <button type="button" class="link-action" (click)="fecharModal()">Fechar</button>
+      </header>
+
+      <div class="repasse-form">
+        <label>
+          <span>Titulo</span>
+          <input
+            [ngModel]="formulario().titulo"
+            (ngModelChange)="atualizarFormulario('titulo', $event)"
+            placeholder="Ex: Atualizacao no sistema X"
+          />
+        </label>
+
+        <label>
+          <span>Descricao</span>
+          <textarea
+            [ngModel]="formulario().conteudo"
+            (ngModelChange)="atualizarFormulario('conteudo', $event)"
+            rows="5"
+            placeholder="Descreva o comunicado para o time de suporte"
+          ></textarea>
+        </label>
+
+        <div class="repasse-form-row">
+          <label>
+            <span>Tag</span>
+            <select [ngModel]="formulario().categoria" (ngModelChange)="atualizarFormulario('categoria', $event)">
+              <option value="Urgente">Urgente</option>
+              <option value="Informativo">Informativo</option>
+              <option value="Atualizacao">Atualizacao</option>
+              <option value="Manutencao">Manutencao</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Prioridade</span>
+            <select [ngModel]="formulario().prioridade" (ngModelChange)="atualizarFormulario('prioridade', $event)">
+              <option value="Alta">Alta</option>
+              <option value="Media">Media</option>
+              <option value="Baixa">Baixa</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="repasse-checkbox">
+          <input
+            type="checkbox"
+            [checked]="formulario().fixado"
+            (change)="atualizarFormulario('fixado', !formulario().fixado)"
+          />
+          <span>Fixar no topo</span>
+        </label>
+
+        <label>
+          <span>Anexo</span>
+          <input
+            [ngModel]="formulario().anexoNome"
+            (ngModelChange)="atualizarFormulario('anexoNome', $event)"
+            placeholder="Nome do arquivo ou referencia futura"
+          />
+        </label>
+      </div>
+
+      <footer class="repasse-modal-footer">
+        <button type="button" class="secondary-button" (click)="fecharModal()">Cancelar</button>
+        <button type="button" class="primary-button" (click)="salvarRepasse()">Salvar</button>
+      </footer>
+    </section>
+  </div>
+}

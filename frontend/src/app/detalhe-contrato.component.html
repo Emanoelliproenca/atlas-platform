@@ -1,0 +1,175 @@
+<section class="detail-shell">
+  @if (carregando()) {
+    <div class="info-card">Carregando detalhe do contrato...</div>
+  } @else if (erro()) {
+    <div class="info-card error-card">{{ erro() }}</div>
+  } @else if (detalhe(); as dados) {
+    <header class="contract-top">
+      <div>
+        <h1>{{ dados.contrato.nome }}</h1>
+        <p>
+          Contrato
+          <span aria-hidden="true">•</span>
+          {{ dados.contrato.grupo || '-' }}
+          <span aria-hidden="true">•</span>
+          {{ dados.contrato.ativo ? 'Ativo' : 'Inativo' }}
+        </p>
+      </div>
+      <a routerLink="/relacionamentos" class="back-link">Voltar</a>
+    </header>
+
+    <p class="metrics-line">
+      <strong>{{ dados.servicos.length }}</strong> servicos
+      <span aria-hidden="true">•</span>
+      <strong>{{ totalSetores(dados) }}</strong> setor{{ totalSetores(dados) === 1 ? '' : 'es' }}
+      <span aria-hidden="true">•</span>
+      {{ ultimaVersao(dados) }}
+    </p>
+
+    <div class="detail-grid">
+      <section class="contract-info">
+        <h2>Contrato</h2>
+        <dl>
+          <div>
+            <dt>Contrato</dt>
+            <dd>{{ dados.contrato.nome }}</dd>
+          </div>
+          <div>
+            <dt>Grupo</dt>
+            <dd>{{ dados.contrato.grupo || '-' }}</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>{{ dados.contrato.ativo ? 'Ativo' : 'Inativo' }}</dd>
+          </div>
+          <div>
+            <dt>Central</dt>
+            <dd>
+              @if (dados.contrato.centralUrl) {
+                <a [href]="dados.contrato.centralUrl" target="_blank" rel="noopener" class="external-link" [title]="dados.contrato.centralUrl">Acessar</a>
+              } @else {
+                -
+              }
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="documentation-panel">
+        <div class="doc-block">
+          @if (ehAdmin()) {
+            <label class="form-field">
+              <span>Particularidades</span>
+              <textarea
+                [ngModel]="particularidades()"
+                (ngModelChange)="particularidades.set($event)"
+                rows="4"
+                placeholder="Nenhuma particularidade registrada."
+              ></textarea>
+            </label>
+          } @else {
+            <h4>Particularidades</h4>
+            <p>{{ dados.contrato.particularidades || 'Nenhuma particularidade registrada ate o momento.' }}</p>
+          }
+        </div>
+
+        <div class="doc-block">
+          @if (ehAdmin()) {
+            <label class="form-field">
+              <span>Documentacao operacional</span>
+              <textarea
+                [ngModel]="documentacao()"
+                (ngModelChange)="documentacao.set($event)"
+                rows="5"
+                placeholder="Nenhuma documentacao operacional registrada."
+              ></textarea>
+            </label>
+            <div class="doc-actions">
+              <button type="button" class="primary-button" (click)="salvarDocumentacao()" [disabled]="salvando() || !podeSalvarDocumentacao()">
+                {{ salvando() ? 'Salvando...' : 'Salvar documentacao' }}
+              </button>
+            </div>
+          } @else {
+            <h4>Documentacao operacional</h4>
+            <p>{{ dados.contrato.documentacao || 'Nenhuma documentacao operacional registrada ate o momento.' }}</p>
+          }
+        </div>
+
+        <div class="doc-block files-block">
+          <div class="files-head">
+            <h4>Arquivos do contrato</h4>
+            @if (ehAdmin()) {
+              <label class="upload-button" [class.disabled]="enviandoArquivo()">
+                {{ enviandoArquivo() ? 'Enviando...' : '+ Adicionar arquivo' }}
+                <input type="file" accept="application/pdf,*/*" [disabled]="enviandoArquivo()" (change)="adicionarArquivo($event)" />
+              </label>
+            }
+          </div>
+
+          <div class="files-list">
+            @for (arquivo of dados.arquivos ?? []; track arquivo.id) {
+              <article class="file-item">
+                <span class="file-icon">PDF</span>
+                <div class="file-copy">
+                  <strong [title]="arquivo.nome">{{ arquivo.nome }}</strong>
+                  <small>{{ tamanhoArquivo(arquivo.tamanho) }}</small>
+                </div>
+                <div class="file-actions">
+                  <button type="button" class="file-action" (click)="abrirArquivo(arquivo)">Abrir</button>
+                  <button type="button" class="file-action" (click)="baixarArquivo(arquivo)">Baixar</button>
+                </div>
+              </article>
+            } @empty {
+              <p class="empty-files">Nenhum arquivo vinculado.</p>
+            }
+          </div>
+
+          @if (erroArquivo()) {
+            <p class="file-error">{{ erroArquivo() }}</p>
+          }
+        </div>
+
+        @if (mensagemSucesso()) {
+          <p class="success-banner">{{ mensagemSucesso() }}</p>
+        }
+      </section>
+    </div>
+
+    <article class="table-card">
+      <div class="section-header">
+        <div>
+          <h2>Servicos vinculados ({{ dados.servicos.length }})</h2>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Servico</th>
+              <th>Versao</th>
+              <th>Setor</th>
+              <th>Observacao</th>
+              <th>Acao</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of dados.servicos; track item.id) {
+              <tr>
+                <td>{{ item.servicoNome }}</td>
+                <td>{{ item.versao || '-' }}</td>
+                <td>{{ item.setor || '-' }}</td>
+                <td>{{ item.observacao || '-' }}</td>
+                <td><a class="row-action" [routerLink]="['/servicos', item.servicoId]">Ver</a></td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-state">Nenhum servico vinculado.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  }
+</section>

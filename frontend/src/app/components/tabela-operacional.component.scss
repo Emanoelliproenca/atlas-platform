@@ -1,0 +1,257 @@
+.table-card {
+  padding: 1.2rem;
+  border: 1px solid rgba(141, 164, 150, 0.3);
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.8));
+  box-shadow: 0 18px 44px rgba(15, 81, 50, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.table-header {
+  margin-bottom: 1rem;
+}
+
+.section-eyebrow {
+  margin: 0 0 0.45rem;
+  color: #1f7a4d;
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+h3 {
+  margin: 0;
+  color: #10251b;
+  font-size: 1.45rem;
+  line-height: 1.15;
+}
+
+.table-subtitle,
+.results-meta small {
+  margin: 0.5rem 0 0;
+  color: #65796d;
+  line-height: 1.5;
+}
+
+.results-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.table-total {
+  display: inline-flex;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: #e8f6ee;
+  color: #0f5132;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid rgba(216, 230, 220, 0.86);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead {
+  background: linear-gradient(180deg, #f7faf7, #f2f8f5);
+}
+
+th,
+td {
+  padding: 0.95rem 0.9rem;
+  border-bottom: 1px solid #e2ebe5;
+  color: #10251b;
+  vertical-align: middle;
+}
+
+th {
+  color: #65796d;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.11em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+tbody tr {
+  transition:
+    background 140ms ease,
+    transform 140ms ease;
+}
+
+tbody tr:hover {
+  background: #f8fcfa;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.contract-link,
+.service-link,
+.action-button {
+  text-decoration: none;
+}
+
+.contract-link {
+  color: #10251b;
+  font-weight: 800;
+  white-space: normal;
+}
+
+.service-link {
+  color: #0f5132;
+  font-weight: 800;
+  white-space: normal;
+}
+
+.contract-link:hover,
+.service-link:hover {
+  text-decoration: underline;
+}
+
+.center-cell {
+  text-align: center;
+}
+
+.right-cell {
+  text-align: right;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.95rem;
+  padding: 0.35rem 0.72rem;
+  border-radius: 999px;
+  background: #eff8f0;
+  color: #2e7d53;
+  font-size: 0.8rem;
+  font-weight: 850;
+  box-shadow: inset 0 0 0 1px rgba(46, 125, 83, 0.08);
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.18rem;
+  padding: 0 0.85rem;
+  border: 1px solid #cfe6d8;
+  border-radius: 12px;
+  background: #f2faf5;
+  color: #0f5132;
+  font-weight: 800;
+  transition:
+    transform 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+  background: #e8f6ee;
+  box-shadow: 0 8px 18px rgba(31, 122, 77, 0.12);
+}
+
+.empty-state {
+  padding: 1.6rem;
+  color: #65796d;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .results-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Modern teal/emerald finish */
+.table-card {
+  border-color: rgba(15, 118, 110, 0.16);
+  background:
+    radial-gradient(circle at 96% 0%, rgba(103, 232, 249, 0.16), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 253, 252, 0.86));
+  box-shadow: 0 22px 52px rgba(8, 47, 73, 0.08);
+}
+
+.section-eyebrow {
+  color: #0f9f8f;
+}
+
+h3,
+.contract-link {
+  color: #0b1f24;
+}
+
+.table-subtitle,
+.results-meta small,
+th,
+.empty-state {
+  color: #5f7378;
+}
+
+.table-total {
+  background: linear-gradient(135deg, rgba(103, 232, 249, 0.18), rgba(16, 185, 129, 0.12));
+  color: #0f766e;
+  box-shadow: inset 0 0 0 1px rgba(20, 184, 166, 0.12);
+}
+
+.table-wrapper {
+  border-color: rgba(15, 118, 110, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 10px 26px rgba(8, 47, 73, 0.04);
+}
+
+thead {
+  background: linear-gradient(180deg, #f8fffd, #ecfeff);
+}
+
+th,
+td {
+  border-bottom-color: rgba(15, 118, 110, 0.1);
+}
+
+tbody tr:hover {
+  background: #f0fdfa;
+}
+
+.service-link {
+  color: #0f766e;
+}
+
+.status-badge {
+  background: #dcfce7;
+  color: #047857;
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.12);
+}
+
+.action-button {
+  border-color: rgba(20, 184, 166, 0.24);
+  background: #ecfeff;
+  color: #0f766e;
+}
+
+.action-button:hover {
+  background: #dffcf4;
+  box-shadow: 0 10px 22px rgba(8, 145, 178, 0.14);
+}

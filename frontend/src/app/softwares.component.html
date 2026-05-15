@@ -1,0 +1,164 @@
+<section class="software-shell">
+  <header class="software-header">
+    <div>
+      <p class="eyebrow">Modulo operacional</p>
+      <h1>Softwares</h1>
+      <p class="header-copy">Versoes, status e disponibilidade dos artefatos digitais.</p>
+    </div>
+
+    <div class="header-actions">
+      <span class="header-badge">Central de versoes</span>
+      @if (ehAdmin()) {
+        <button type="button" class="ghost-button" (click)="sincronizarVersoes()">Sincronizar versoes</button>
+      }
+    </div>
+  </header>
+
+  <section class="summary-grid">
+    <article class="summary-card">
+      <span>Softwares mapeados</span>
+      <strong>{{ itens().length }}</strong>
+    </article>
+    <article class="summary-card">
+      <span>Atualizados</span>
+      <strong>{{ atualizadosCount() }}</strong>
+    </article>
+    <article class="summary-card">
+      <span>Pendentes de revisao</span>
+      <strong>{{ pendentesCount() }}</strong>
+    </article>
+    <article class="summary-card">
+      <span>Ultima sincronizacao</span>
+      <strong>{{ ultimaSincronizacao() }}</strong>
+    </article>
+  </section>
+
+  @if (erro()) {
+    <article class="feedback-banner error">{{ erro() }}</article>
+  }
+  @if (mensagem()) {
+    <article class="feedback-banner success">{{ mensagem() }}</article>
+  }
+
+  <section class="panel-card">
+    <div class="panel-head">
+      <div>
+        <h2>Consulta de versao</h2>
+        <p>Selecione um item para ver versao, origem e disponibilidade.</p>
+      </div>
+    </div>
+
+    @if (carregando()) {
+      <div class="empty-consulta">Carregando softwares...</div>
+    } @else {
+      <div class="consulta-grid">
+        <label class="field">
+          <span>Software</span>
+          <select [ngModel]="softwareSelecionadoId()" (ngModelChange)="selecionarSoftware($event)">
+            <option [ngValue]="0">Selecione um software</option>
+            @for (item of itens(); track item.id) {
+              <option [ngValue]="item.id">{{ item.nome }}</option>
+            }
+          </select>
+        </label>
+
+        @if (softwareSelecionado(); as software) {
+          <article class="software-result-card">
+            <div class="software-result-top">
+              <div>
+                <h3>{{ software.nome }}</h3>
+                <p>{{ software.descricaoSoftware || 'Sem descricao operacional cadastrada.' }}</p>
+              </div>
+              <span class="status-badge" [class.pending]="software.status === 'Pendente'" [class.unavailable]="software.status === 'Indisponivel'">
+                {{ software.status }}
+              </span>
+            </div>
+
+            <dl class="software-details">
+              <div>
+                <dt>Versao mais recente</dt>
+                <dd>{{ software.versaoReferencia || '-' }}</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd>{{ software.status }}</dd>
+              </div>
+              <div>
+                <dt>Ultima atualizacao</dt>
+                <dd>{{ software.ultimaAtualizacao }}</dd>
+              </div>
+              <div>
+                <dt>Origem do arquivo</dt>
+                <dd>{{ software.origemArquivo }}</dd>
+              </div>
+            </dl>
+
+            <div class="software-observation">
+              <span>Observacao</span>
+              <p>{{ software.observacao }}</p>
+            </div>
+
+            <div class="result-actions">
+              <button
+                type="button"
+                class="primary-button"
+                [disabled]="!software.downloadDisponivel"
+                (click)="baixarSoftware(software)"
+              >
+                {{ software.downloadDisponivel ? 'Baixar versao mais recente' : 'Arquivo indisponivel' }}
+              </button>
+            </div>
+          </article>
+        } @else {
+          <article class="empty-consulta empty-state-card">
+          Selecione um software para consultar status e download.
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="panel-card">
+    <div class="panel-head">
+      <div>
+        <h2>Lista de softwares</h2>
+        <p>Visao geral de versoes e disponibilidade.</p>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Software</th>
+            <th>Versao</th>
+            <th>Status</th>
+            <th>Ultima atualizacao</th>
+            <th>Acao</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of itens(); track item.id) {
+            <tr>
+              <td>{{ item.nome }}</td>
+              <td>{{ item.versaoReferencia || '-' }}</td>
+              <td>
+                <span class="status-badge" [class.pending]="item.status === 'Pendente'" [class.unavailable]="item.status === 'Indisponivel'">
+                  {{ item.status }}
+                </span>
+              </td>
+              <td>{{ item.ultimaAtualizacao }}</td>
+              <td>
+                <button type="button" class="table-action" (click)="selecionarSoftware(item.id)">Visualizar</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-state">Nenhum software mapeado no momento.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

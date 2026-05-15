@@ -1,0 +1,57 @@
+<section class="table-card">
+  <div class="table-header">
+    <div>
+      <p class="section-eyebrow">Resultados</p>
+      <h3>Painel de relacionamentos</h3>
+      <p class="table-subtitle">
+        Leitura cruzada entre contrato, servico, versao e contexto operacional.
+      </p>
+    </div>
+  </div>
+
+  <div class="results-meta">
+    <span class="table-total">Mostrando {{ linhas().length }} resultados</span>
+    <small>{{ ultimaAtualizacao() }}</small>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Contrato</th>
+          <th>Servico</th>
+          <th class="center-cell">Versao</th>
+          <th>Setor</th>
+          <th class="center-cell">Status</th>
+          <th class="right-cell">Ultima leitura</th>
+          <th class="center-cell">Acao</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (linha of linhas(); track linha.relacionamentoId) {
+          <tr>
+            <td class="contract-cell">
+              <a class="contract-link" [routerLink]="['/contratos', linha.contratoId]">{{ linha.contratoNome }}</a>
+            </td>
+            <td>
+              <a class="service-link" [routerLink]="['/servicos', linha.servicoId]">{{ linha.servicoNome }}</a>
+            </td>
+            <td class="center-cell">{{ linha.versao || '-' }}</td>
+            <td>{{ linha.setor || 'Sem setor definido' }}</td>
+            <td class="center-cell">
+              <span class="status-badge">Ativo</span>
+            </td>
+            <td class="right-cell">{{ ultimaAtualizacao() }}</td>
+            <td class="center-cell">
+              <a class="action-button" [routerLink]="['/contratos', linha.contratoId]">Visualizar</a>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="empty-state">Nenhum relacionamento encontrado.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

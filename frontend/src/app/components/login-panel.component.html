@@ -1,0 +1,58 @@
+<div class="brand-wordmark" aria-label="ATLAS">
+  <strong>ATLAS</strong>
+</div>
+
+<header class="panel-heading">
+  <h2 class="panel-title">Acesse sua conta</h2>
+  <p class="panel-subtitle">Demo corporativa com dados ficticios.</p>
+</header>
+
+<label class="field-hidden">
+  <input [ngModel]="baseUrl()" (ngModelChange)="baseUrlChange.emit($event)" placeholder="http://localhost:8091" />
+</label>
+
+<div class="form-stack">
+  <mat-form-field appearance="outline" class="login-form-field">
+    <span matTextPrefix class="field-icon user-icon" aria-hidden="true"></span>
+    <input matInput [ngModel]="username()" (ngModelChange)="usernameChange.emit($event)" placeholder="Usuario" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="login-form-field">
+    <span matTextPrefix class="field-icon lock-icon" aria-hidden="true"></span>
+    <input
+      matInput
+      [type]="mostrarSenha() ? 'text' : 'password'"
+      [ngModel]="password()"
+      (ngModelChange)="passwordChange.emit($event)"
+      placeholder="Senha"
+    />
+    <button
+      mat-icon-button
+      matSuffix
+      type="button"
+      class="field-toggle"
+      (click)="alternarSenha()"
+      [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
+    >
+      <span class="eye-icon" [class.visible]="mostrarSenha()" aria-hidden="true"></span>
+    </button>
+  </mat-form-field>
+</div>
+
+<div class="support-row">
+  <mat-checkbox class="remember-field" [checked]="lembrarAcesso()" (change)="lembrarAcesso.set(!lembrarAcesso())">
+    Lembrar acesso
+  </mat-checkbox>
+  <button type="button" class="text-link" (click)="usarApiPadrao.emit()">Usar API demo</button>
+</div>
+
+<button mat-flat-button type="button" class="primary-button" (click)="entrar.emit()" [disabled]="carregando()">
+  @if (carregando()) {
+    <mat-spinner diameter="18"></mat-spinner>
+  }
+  <span>{{ carregando() ? 'Entrando...' : 'Entrar' }}</span>
+</button>
+
+@if (erro()) {
+  <p class="error-banner">{{ erro() }}</p>
+}

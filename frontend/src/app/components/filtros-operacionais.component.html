@@ -1,0 +1,54 @@
+<section class="filters-card">
+  <div class="filters-header">
+    <div>
+      <p class="section-eyebrow">Consulta rapida</p>
+      <h2>Filtrar consulta operacional</h2>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="primary-button" (click)="aplicar.emit()" [disabled]="carregando()">
+        {{ carregando() ? 'Buscando...' : 'Buscar' }}
+      </button>
+      <button type="button" class="ghost-button" (click)="limpar.emit()">Limpar filtros</button>
+    </div>
+  </div>
+
+  <div class="filters-row">
+    <label class="filter-field">
+      <span>Contrato</span>
+      <select [ngModel]="contratoSelecionado()" (ngModelChange)="selecionarContrato($event)">
+        <option [ngValue]="0">Todos</option>
+        @for (item of filtros().contratos; track item.id) {
+          <option [ngValue]="item.id">{{ item.nome }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>Servico</span>
+      <select [ngModel]="servicoSelecionado()" (ngModelChange)="selecionarServico($event)">
+        <option [ngValue]="0">Todos</option>
+        @for (item of filtros().servicos; track item.id) {
+          <option [ngValue]="item.id">{{ item.nome }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>Setor</span>
+      <select [ngModel]="setor()" (ngModelChange)="setorChange.emit($event)">
+        <option value="">Todos</option>
+        @for (item of filtros().setores; track item) {
+          <option [value]="item">{{ item }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>Status</span>
+      <select disabled>
+        <option selected>Ativos</option>
+      </select>
+    </label>
+  </div>
+</section>

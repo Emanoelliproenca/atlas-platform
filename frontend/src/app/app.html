@@ -1,0 +1,212 @@
+<main class="atlas-theme" [class.login-mode]="exibeLogin()">
+  @if (!exibeLogin()) {
+    <div class="app-shell">
+      <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-badge">AT</div>
+      <div>
+        <p class="brand-overline">Portfolio Demo</p>
+        <strong>ATLAS</strong>
+        <span class="brand-subtitle">SaaS Operations</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/" routerLinkActive="active-nav" [routerLinkActiveOptions]="{ exact: true }" class="nav-item">
+        <span class="nav-icon">⌂</span>
+        <span>Home</span>
+      </a>
+      <a routerLink="/relacionamentos" routerLinkActive="active-nav" class="nav-item">
+        <span class="nav-icon">⟲</span>
+        <span>Relacionamentos</span>
+      </a>
+      <a routerLink="/softwares" routerLinkActive="active-nav" class="nav-item">
+        <span class="nav-icon">✦</span>
+        <span>Softwares</span>
+      </a>
+      <a routerLink="/repasse" routerLinkActive="active-nav" class="nav-item">
+        <span class="nav-icon">▣</span>
+        <span>Repasse</span>
+      </a>
+      @if (ehAdmin()) {
+        <a routerLink="/cadastros" routerLinkActive="active-nav" class="nav-item">
+          <span class="nav-icon">＋</span>
+          <span>Cadastros</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">{{ iniciaisUsuario() }}</div>
+      <div>
+        <strong>{{ username() || 'Operador Atlas' }}</strong>
+        <p>{{ autenticado() ? perfilUsuario() : 'Aguardando login' }}</p>
+        @if (autenticado()) {
+          <span>{{ sessaoRestante() }}</span>
+        }
+      </div>
+    </div>
+      </aside>
+
+      <section class="content-shell">
+        @if (exibeHome()) {
+          <section class="home-stack">
+            @if (autenticado()) {
+              <header class="home-header">
+                <div class="home-brand">
+                  <strong>ATLAS</strong>
+                  <span>Portfolio corporativo</span>
+                </div>
+
+                <div class="home-userbar">
+                  <div class="home-usercopy">
+                    <strong>{{ username() || 'Operador Atlas' }}</strong>
+                    <span>{{ perfilUsuario() }}</span>
+                  </div>
+                  <button type="button" class="home-logout" (click)="sair()">Sair</button>
+                </div>
+              </header>
+
+              <section class="home-welcome">
+                <div class="home-copy">
+                  <p class="home-kicker">Command center operacional</p>
+                  <h1>Bem-vinda ao ATLAS</h1>
+                  <p>Contratos SaaS, servicos digitais e repasses simulados em uma unica leitura operacional.</p>
+                  <div class="home-hero-actions">
+                    <a routerLink="/relacionamentos" class="hero-primary-link">Abrir painel</a>
+                    @if (ehAdmin()) {
+                      <a routerLink="/cadastros" class="hero-secondary-link">Gerenciar base</a>
+                    }
+                  </div>
+                </div>
+
+                <div class="home-product-mark" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </section>
+
+              <section class="home-metrics">
+                <article class="home-metric-card">
+                  <span>Relacionamentos</span>
+                  <strong>{{ painel()?.resumo?.totalRelacionamentos ?? 0 }}</strong>
+                  <small>Contratos conectados a servicos</small>
+                </article>
+                <article class="home-metric-card">
+                  <span>Contratos SaaS</span>
+                  <strong>{{ painel()?.resumo?.totalContratos ?? 0 }}</strong>
+                  <small>Base contratual ativa</small>
+                </article>
+                <article class="home-metric-card">
+                  <span>Servicos digitais</span>
+                  <strong>{{ painel()?.resumo?.totalServicos ?? 0 }}</strong>
+                  <small>Modulos em operacao</small>
+                </article>
+                <article class="home-metric-card">
+                  <span>Setores</span>
+                  <strong>{{ painel()?.resumo?.totalSetores ?? 0 }}</strong>
+                  <small>Areas responsaveis</small>
+                </article>
+              </section>
+
+              <section class="shortcut-grid">
+                <a [routerLink]="ehAdmin() ? '/cadastros' : '/relacionamentos'" class="shortcut-card">
+                  <span class="shortcut-icon">⟲</span>
+                  <strong>Relacionamentos</strong>
+                  <p>Matriz entre contratos, servicos, versoes e setores.</p>
+                  <small>Abrir matriz operacional</small>
+                </a>
+
+                <a routerLink="/repasse" class="shortcut-card">
+                  <span class="shortcut-icon">▣</span>
+                  <strong>Repasse</strong>
+                  <p>Comunicados e orientacoes para o time.</p>
+                  <small>Ver comunicados</small>
+                </a>
+
+                <a routerLink="/softwares" class="shortcut-card">
+                  <span class="shortcut-icon">✦</span>
+                  <strong>Softwares</strong>
+                  <p>Versoes, status e disponibilidade de arquivos.</p>
+                  <small>Consultar versoes</small>
+                </a>
+              </section>
+            } @else {
+              <section class="home-empty">
+                <p class="panel-kicker">Acesso</p>
+                <h3>Entre para consultar a base operacional</h3>
+                <p>O login agora fica em uma pagina separada para manter a Home limpa.</p>
+                <a routerLink="/login" class="primary-link">Abrir login</a>
+              </section>
+            }
+          </section>
+        }
+
+        <router-outlet />
+      </section>
+    </div>
+  } @else {
+    <section class="login-stage">
+      <div class="login-atmosphere" aria-hidden="true">
+        <span class="atmosphere-glow glow-primary"></span>
+        <span class="atmosphere-glow glow-secondary"></span>
+        <span class="atmosphere-ring ring-a"></span>
+        <span class="atmosphere-ring ring-b"></span>
+        <span class="atmosphere-line line-a"></span>
+        <span class="atmosphere-line line-b"></span>
+      </div>
+      <div class="login-layout">
+        <div class="login-hero">
+          <div class="login-brand-lockup">
+            <span class="login-brand-mark" aria-hidden="true"></span>
+            <div>
+              <strong>ATLAS</strong>
+              <span>SaaS B2B operacional</span>
+            </div>
+          </div>
+
+          <div class="login-scene" aria-hidden="true">
+            <div class="data-orbits">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="login-floating-layer">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="login-logo-art">
+              <img src="/atlas-mascot-premium.png" alt="Mascote ATLAS segurando um planeta digital" />
+            </div>
+          </div>
+
+          <p class="login-hero-footnote">Gestão operacional completa em um único painel.</p>
+        </div>
+
+        <div class="login-side">
+          <app-login-panel
+            class="login-card"
+            [autenticado]="autenticado()"
+            [baseUrl]="baseUrl()"
+            [username]="username()"
+            [password]="password()"
+            [sessaoRestante]="sessaoRestante()"
+            [erro]="erro()"
+            [carregando]="carregando()"
+            [ehAdmin]="ehAdmin()"
+            (baseUrlChange)="baseUrl.set($event)"
+            (usernameChange)="username.set($event)"
+            (passwordChange)="password.set($event)"
+            (entrar)="entrar()"
+            (usarApiPadrao)="usarApiPadrao()"
+            (atualizar)="carregarPainel()"
+            (sair)="sair()"
+          />
+        </div>
+      </div>
+    </section>
+  }
+</main>
