@@ -32,7 +32,7 @@ export class DetalheServicoComponent {
 
     if (!servicoId) {
       this.carregando.set(false);
-      this.erro.set('Servico invalido.');
+      this.erro.set('Serviço inválido.');
       return;
     }
 
@@ -41,7 +41,7 @@ export class DetalheServicoComponent {
       .subscribe({
         next: (response) => this.detalhe.set(response.dados),
         error: (error) => {
-          this.erro.set(this.apiFeedback.mensagem(error, 'Nao foi possivel carregar o detalhe do servico.'));
+          this.erro.set(this.apiFeedback.mensagem(error, 'Não foi possível carregar o detalhe do serviço.'));
         }
       });
   }

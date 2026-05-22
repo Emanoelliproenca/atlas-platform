@@ -1,35 +1,52 @@
-<main class="atlas-theme" [class.login-mode]="exibeLogin()">
-  @if (!exibeLogin()) {
+<main class="atlas-theme" [class.login-mode]="exibeLogin() || !autenticado()">
+  @if (!exibeLogin() && autenticado()) {
     <div class="app-shell">
-      <aside class="sidebar">
+      <button
+        type="button"
+        class="mobile-menu-button"
+        (click)="alternarMenuMobile()"
+        [attr.aria-expanded]="menuMobileAberto()"
+        aria-controls="atlas-sidebar"
+        aria-label="Abrir menu de navegacao"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      @if (menuMobileAberto()) {
+        <button type="button" class="mobile-sidebar-backdrop" aria-label="Fechar menu" (click)="fecharMenuMobile()"></button>
+      }
+
+      <aside id="atlas-sidebar" class="sidebar" [class.mobile-open]="menuMobileAberto()">
     <div class="sidebar-brand">
       <div class="brand-badge">AT</div>
       <div>
-        <p class="brand-overline">Portfolio Demo</p>
+        <p class="brand-overline">Atlas Ops</p>
         <strong>ATLAS</strong>
-        <span class="brand-subtitle">SaaS Operations</span>
+        <span class="brand-subtitle">Operação B2B</span>
       </div>
     </div>
 
     <nav class="sidebar-nav">
-      <a routerLink="/" routerLinkActive="active-nav" [routerLinkActiveOptions]="{ exact: true }" class="nav-item">
+      <a routerLink="/" routerLinkActive="active-nav" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="fecharMenuMobile()">
         <span class="nav-icon">⌂</span>
-        <span>Home</span>
+        <span>Início</span>
       </a>
-      <a routerLink="/relacionamentos" routerLinkActive="active-nav" class="nav-item">
+      <a routerLink="/relacionamentos" routerLinkActive="active-nav" class="nav-item" (click)="fecharMenuMobile()">
         <span class="nav-icon">⟲</span>
         <span>Relacionamentos</span>
       </a>
-      <a routerLink="/softwares" routerLinkActive="active-nav" class="nav-item">
+      <a routerLink="/softwares" routerLinkActive="active-nav" class="nav-item" (click)="fecharMenuMobile()">
         <span class="nav-icon">✦</span>
-        <span>Softwares</span>
+        <span>Sistemas</span>
       </a>
-      <a routerLink="/repasse" routerLinkActive="active-nav" class="nav-item">
+      <a routerLink="/repasse" routerLinkActive="active-nav" class="nav-item" (click)="fecharMenuMobile()">
         <span class="nav-icon">▣</span>
         <span>Repasse</span>
       </a>
       @if (ehAdmin()) {
-        <a routerLink="/cadastros" routerLinkActive="active-nav" class="nav-item">
+        <a routerLink="/cadastros" routerLinkActive="active-nav" class="nav-item" (click)="fecharMenuMobile()">
           <span class="nav-icon">＋</span>
           <span>Cadastros</span>
         </a>
@@ -40,7 +57,7 @@
       <div class="user-avatar">{{ iniciaisUsuario() }}</div>
       <div>
         <strong>{{ username() || 'Operador Atlas' }}</strong>
-        <p>{{ autenticado() ? perfilUsuario() : 'Aguardando login' }}</p>
+        <p>{{ perfilUsuario() }}</p>
         @if (autenticado()) {
           <span>{{ sessaoRestante() }}</span>
         }
@@ -52,92 +69,94 @@
         @if (exibeHome()) {
           <section class="home-stack">
             @if (autenticado()) {
-              <header class="home-header">
-                <div class="home-brand">
-                  <strong>ATLAS</strong>
-                  <span>Portfolio corporativo</span>
-                </div>
-
-                <div class="home-userbar">
-                  <div class="home-usercopy">
-                    <strong>{{ username() || 'Operador Atlas' }}</strong>
-                    <span>{{ perfilUsuario() }}</span>
+              <section class="home-overview">
+                <header class="home-overview-header">
+                  <div class="home-titleblock">
+                    <p class="home-kicker">Painel executivo</p>
+                    <h1>Dashboard ATLAS</h1>
+                    <p>Indicadores reais da base operacional para acompanhar contratos, vínculos, documentação e sistemas.</p>
                   </div>
-                  <button type="button" class="home-logout" (click)="sair()">Sair</button>
-                </div>
-              </header>
 
-              <section class="home-welcome">
-                <div class="home-copy">
-                  <p class="home-kicker">Command center operacional</p>
-                  <h1>Bem-vinda ao ATLAS</h1>
-                  <p>Contratos SaaS, servicos digitais e repasses simulados em uma unica leitura operacional.</p>
-                  <div class="home-hero-actions">
-                    <a routerLink="/relacionamentos" class="hero-primary-link">Abrir painel</a>
-                    @if (ehAdmin()) {
-                      <a routerLink="/cadastros" class="hero-secondary-link">Gerenciar base</a>
+                  <div class="home-commandbar">
+                    <div class="home-session">
+                      <span>Ambiente ativo</span>
+                      <strong>{{ sessaoRestante() }}</strong>
+                      <small>{{ ultimaAtualizacaoFormatada() }}</small>
+                    </div>
+
+                    <button type="button" class="status-refresh" (click)="carregarDashboard()" [disabled]="carregando()">
+                      {{ carregando() ? 'Atualizando...' : 'Atualizar dados' }}
+                    </button>
+                  </div>
+                </header>
+
+                <div class="home-metrics">
+                  <article class="home-metric-card primary">
+                    <span>Contratos ativos</span>
+                    <strong>{{ homeResumo().contratosAtivos }}</strong>
+                    <small>{{ homeResumo().contratosInativos }} inativos na base</small>
+                  </article>
+                  <article class="home-metric-card">
+                    <span>Serviços</span>
+                    <strong>{{ homeResumo().servicos }}</strong>
+                    <small>Catálogo operacional</small>
+                  </article>
+                  <article class="home-metric-card">
+                    <span>Relacionamentos</span>
+                    <strong>{{ homeResumo().relacionamentos }}</strong>
+                    <small>Vínculos contrato-serviço</small>
+                  </article>
+                  <article class="home-metric-card">
+                    <span>Grupos</span>
+                    <strong>{{ homeResumo().grupos }}</strong>
+                    <small>Carteiras monitoradas</small>
+                  </article>
+                </div>
+              </section>
+
+              <section class="home-dashboard-grid">
+                <article class="home-insight-panel">
+                  <div>
+                    <p class="home-kicker">Distribuição por grupo</p>
+                    <h2>Carteiras com maior presença na base</h2>
+                  </div>
+
+                  <div class="home-health-strip">
+                    <span><strong>{{ homeResumo().documentacao }}</strong> com documentação</span>
+                    <span><strong>{{ homeResumo().vinculos }}</strong> com vínculos</span>
+                    <span><strong>{{ homeResumo().softwaresPendentes }}</strong> sistemas pendentes</span>
+                  </div>
+
+                  <div class="home-distribution-list">
+                    @for (grupo of contratosPorGrupo(); track grupo.nome) {
+                      <span>
+                        <strong>{{ grupo.nome || 'Sem grupo' }}</strong>
+                        <em>{{ grupo.total }} contratos</em>
+                      </span>
+                    } @empty {
+                      <p class="home-empty-copy">Nenhum grupo cadastrado.</p>
                     }
                   </div>
-                </div>
-
-                <div class="home-product-mark" aria-hidden="true">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </section>
-
-              <section class="home-metrics">
-                <article class="home-metric-card">
-                  <span>Relacionamentos</span>
-                  <strong>{{ painel()?.resumo?.totalRelacionamentos ?? 0 }}</strong>
-                  <small>Contratos conectados a servicos</small>
                 </article>
-                <article class="home-metric-card">
-                  <span>Contratos SaaS</span>
-                  <strong>{{ painel()?.resumo?.totalContratos ?? 0 }}</strong>
-                  <small>Base contratual ativa</small>
-                </article>
-                <article class="home-metric-card">
-                  <span>Servicos digitais</span>
-                  <strong>{{ painel()?.resumo?.totalServicos ?? 0 }}</strong>
-                  <small>Modulos em operacao</small>
-                </article>
-                <article class="home-metric-card">
-                  <span>Setores</span>
-                  <strong>{{ painel()?.resumo?.totalSetores ?? 0 }}</strong>
-                  <small>Areas responsaveis</small>
-                </article>
-              </section>
 
-              <section class="shortcut-grid">
-                <a [routerLink]="ehAdmin() ? '/cadastros' : '/relacionamentos'" class="shortcut-card">
-                  <span class="shortcut-icon">⟲</span>
-                  <strong>Relacionamentos</strong>
-                  <p>Matriz entre contratos, servicos, versoes e setores.</p>
-                  <small>Abrir matriz operacional</small>
-                </a>
+                <article class="home-insight-panel home-repasses-panel">
+                  <div>
+                    <p class="home-kicker">Últimos repasses</p>
+                    <h2>Comunicados recentes da operação</h2>
+                  </div>
 
-                <a routerLink="/repasse" class="shortcut-card">
-                  <span class="shortcut-icon">▣</span>
-                  <strong>Repasse</strong>
-                  <p>Comunicados e orientacoes para o time.</p>
-                  <small>Ver comunicados</small>
-                </a>
-
-                <a routerLink="/softwares" class="shortcut-card">
-                  <span class="shortcut-icon">✦</span>
-                  <strong>Softwares</strong>
-                  <p>Versoes, status e disponibilidade de arquivos.</p>
-                  <small>Consultar versoes</small>
-                </a>
-              </section>
-            } @else {
-              <section class="home-empty">
-                <p class="panel-kicker">Acesso</p>
-                <h3>Entre para consultar a base operacional</h3>
-                <p>O login agora fica em uma pagina separada para manter a Home limpa.</p>
-                <a routerLink="/login" class="primary-link">Abrir login</a>
+                  <div class="home-feed-list">
+                    @for (repasse of ultimosRepasses(); track repasse.id) {
+                      <a routerLink="/repasse">
+                        <span>{{ repasse.categoria }}</span>
+                        <strong>{{ repasse.titulo }}</strong>
+                        <small>{{ repasse.prioridade }} · {{ repasse.criadoEm ? (repasse.criadoEm | date: 'dd/MM/yyyy HH:mm') : 'Sem data' }}</small>
+                      </a>
+                    } @empty {
+                      <p class="home-empty-copy">Nenhum repasse operacional publicado.</p>
+                    }
+                  </div>
+                </article>
               </section>
             }
           </section>
@@ -148,42 +167,24 @@
     </div>
   } @else {
     <section class="login-stage">
-      <div class="login-atmosphere" aria-hidden="true">
-        <span class="atmosphere-glow glow-primary"></span>
-        <span class="atmosphere-glow glow-secondary"></span>
-        <span class="atmosphere-ring ring-a"></span>
-        <span class="atmosphere-ring ring-b"></span>
-        <span class="atmosphere-line line-a"></span>
-        <span class="atmosphere-line line-b"></span>
-      </div>
       <div class="login-layout">
         <div class="login-hero">
-          <div class="login-brand-lockup">
-            <span class="login-brand-mark" aria-hidden="true"></span>
+          <header class="login-brand-lockup">
+            <span class="login-brand-mark" aria-hidden="true">
+              <img src="/logo.png" alt="" />
+            </span>
             <div>
               <strong>ATLAS</strong>
-              <span>SaaS B2B operacional</span>
+              <span>OPERAÇÃO B2B</span>
             </div>
+          </header>
+
+          <div class="login-hero-copy">
+            <h1>Operação B2B em uma visão clara.</h1>
+            <p>Contratos, serviços e relacionamentos organizados para decisões rápidas e seguras.</p>
           </div>
 
-          <div class="login-scene" aria-hidden="true">
-            <div class="data-orbits">
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <div class="login-floating-layer">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <div class="login-logo-art">
-              <img src="/atlas-mascot-premium.png" alt="Mascote ATLAS segurando um planeta digital" />
-            </div>
-          </div>
-
-          <p class="login-hero-footnote">Gestão operacional completa em um único painel.</p>
+          <p class="login-hero-footnote">© 2026 Atlas Labs. Todos os direitos reservados.</p>
         </div>
 
         <div class="login-side">
@@ -201,8 +202,7 @@
             (usernameChange)="username.set($event)"
             (passwordChange)="password.set($event)"
             (entrar)="entrar()"
-            (usarApiPadrao)="usarApiPadrao()"
-            (atualizar)="carregarPainel()"
+            (atualizar)="carregarDashboard()"
             (sair)="sair()"
           />
         </div>

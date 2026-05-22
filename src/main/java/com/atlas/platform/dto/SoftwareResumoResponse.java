@@ -13,7 +13,10 @@ public class SoftwareResumoResponse {
     private String nome;
     private String descricaoSoftware;
     private String versaoReferencia;
+    private String linkSoftware;
     private int totalContratos;
     private Boolean ativo;
+    private Boolean downloadDisponivel;
+    private String artefatoNome;
 
 }

@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
 import {
   ApiResponse,
   AuthLoginPayload,
@@ -12,9 +11,11 @@ import {
   ContratoResponse,
   ContratoServicoRequestPayload,
   ContratoServicoResponse,
+  DashboardMetrics,
   PainelOperacional,
   PainelRequest,
   RepasseItem,
+  RepasseRequestPayload,
   ServicoDetalhe,
   ServicoRequestPayload,
   ServicoResponse,
@@ -24,11 +25,14 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class PainelOperacionalApi {
-  private readonly apiUrl = environment.apiUrl.replace(/\/+$/, '');
   private readonly http = inject(HttpClient);
 
   carregarPainel(request: PainelRequest): Observable<ApiResponse<PainelOperacional>> {
     return this.get('/painel/operacional', this.buildPainelParams(request));
+  }
+
+  carregarDashboardMetrics(): Observable<ApiResponse<DashboardMetrics>> {
+    return this.get('/dashboard/metrics');
   }
 
   carregarContratoDetalhe(contratoId: number): Observable<ApiResponse<ContratoDetalhe>> {
@@ -139,8 +143,48 @@ export class PainelOperacionalApi {
     return this.get('/repasses');
   }
 
+  criarRepasse(request: RepasseRequestPayload): Observable<ApiResponse<RepasseItem>> {
+    return this.post('/repasses', request);
+  }
+
+  atualizarRepasse(repasseId: number, request: RepasseRequestPayload): Observable<ApiResponse<RepasseItem>> {
+    return this.put(`/repasses/${repasseId}`, request);
+  }
+
+  ativarRepasse(repasseId: number): Observable<ApiResponse<RepasseItem>> {
+    return this.patch(`/repasses/${repasseId}/ativar`);
+  }
+
+  inativarRepasse(repasseId: number): Observable<ApiResponse<RepasseItem>> {
+    return this.patch(`/repasses/${repasseId}/inativar`);
+  }
+
+  fixarRepasse(repasseId: number): Observable<ApiResponse<RepasseItem>> {
+    return this.patch(`/repasses/${repasseId}/fixar`);
+  }
+
   carregarSoftwares(): Observable<ApiResponse<SoftwareResumo[]>> {
     return this.get('/softwares');
+  }
+
+  criarSoftware(request: ServicoRequestPayload): Observable<ApiResponse<ServicoResponse>> {
+    return this.post('/softwares', request);
+  }
+
+  atualizarSoftware(servicoId: number, request: ServicoRequestPayload): Observable<ApiResponse<ServicoResponse>> {
+    return this.put(`/softwares/${servicoId}`, request);
+  }
+
+  ativarSoftware(servicoId: number): Observable<ApiResponse<ServicoResponse>> {
+    return this.patch(`/softwares/${servicoId}/ativar`);
+  }
+
+  inativarSoftware(servicoId: number): Observable<ApiResponse<ServicoResponse>> {
+    return this.patch(`/softwares/${servicoId}/inativar`);
+  }
+
+  baixarSoftware(servicoId: number): Observable<Blob> {
+    return this.getBlob(`/softwares/${servicoId}/download`);
   }
 
   private get<T>(url: string, params?: HttpParams): Observable<ApiResponse<T>> {
@@ -189,11 +233,7 @@ export class PainelOperacionalApi {
   }
 
   private resolveApiUrl(path: string): string {
-    if (path.startsWith('http')) {
-      return path;
-    }
-
-    return `${this.apiUrl}${path.startsWith('/') ? path : `/${path}`}`;
+    return path.startsWith('/') ? path : `/${path}`;
   }
 }
 
@@ -208,12 +248,14 @@ export type {
   ContratoResponse,
   ContratoServicoRequestPayload,
   ContratoServicoResponse,
+  DashboardMetrics,
   PainelFiltros,
   PainelLinha,
   PainelOperacional,
   PainelRequest,
   PainelResumo,
   RepasseItem,
+  RepasseRequestPayload,
   ServicoDetalhe,
   ServicoOption,
   ServicoRequestPayload,

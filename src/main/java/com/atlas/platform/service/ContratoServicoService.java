@@ -30,17 +30,20 @@ public class ContratoServicoService {
     private final ContratoRepository contratoRepository;
     private final ServicoRepository servicoRepository;
     private final ContratoServicoMapper contratoServicoMapper;
+    private final AuditoriaService auditoriaService;
 
     public ContratoServicoService(
             ContratoServicoRepository repository,
             ContratoRepository contratoRepository,
             ServicoRepository servicoRepository,
-            ContratoServicoMapper contratoServicoMapper
+            ContratoServicoMapper contratoServicoMapper,
+            AuditoriaService auditoriaService
     ) {
         this.repository = repository;
         this.contratoRepository = contratoRepository;
         this.servicoRepository = servicoRepository;
         this.contratoServicoMapper = contratoServicoMapper;
+        this.auditoriaService = auditoriaService;
     }
 
     @Transactional
@@ -55,7 +58,10 @@ public class ContratoServicoService {
         ContratoServico contratoServico = new ContratoServico();
         aplicarVinculo(contratoServico, contrato, servico, request);
 
-        return contratoServicoMapper.toResponse(repository.save(contratoServico));
+        ContratoServico salvo = repository.save(contratoServico);
+        auditoriaService.registrar("CONTRATO_SERVICO", salvo.getId(), "CREATE_RELACIONAMENTO",
+                "Relacionamento criado entre contrato " + contrato.getNome() + " e serviço " + servico.getNome());
+        return contratoServicoMapper.toResponse(salvo);
     }
 
     public List<ContratoServicoResponse> listar(
@@ -95,6 +101,14 @@ public class ContratoServicoService {
                 .toList();
     }
 
+    public boolean existeVinculoAtivoParaContrato(Long contratoId) {
+        return repository.existsByContratoIdAndAtivoTrue(contratoId);
+    }
+
+    public boolean existeVinculoAtivoParaServico(Long servicoId) {
+        return repository.existsByServicoIdAndAtivoTrue(servicoId);
+    }
+
     @Transactional
     public ContratoServicoResponse atualizar(Long id, ContratoServicoRequest request) {
         ContratoServico relacionamento = buscarRelacionamento(id);
@@ -113,7 +127,10 @@ public class ContratoServicoService {
                 request
         );
 
-        return contratoServicoMapper.toResponse(repository.save(relacionamento));
+        ContratoServico salvo = repository.save(relacionamento);
+        auditoriaService.registrar("CONTRATO_SERVICO", salvo.getId(), "UPDATE_RELACIONAMENTO",
+                "Relacionamento atualizado entre contrato " + salvo.getContrato().getNome() + " e serviço " + salvo.getServico().getNome());
+        return contratoServicoMapper.toResponse(salvo);
     }
 
     @Transactional

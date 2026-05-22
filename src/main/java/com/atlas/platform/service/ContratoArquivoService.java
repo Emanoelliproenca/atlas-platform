@@ -22,10 +22,16 @@ public class ContratoArquivoService {
 
     private final ContratoArquivoRepository repository;
     private final ContratoRepository contratoRepository;
+    private final AuditoriaService auditoriaService;
 
-    public ContratoArquivoService(ContratoArquivoRepository repository, ContratoRepository contratoRepository) {
+    public ContratoArquivoService(
+            ContratoArquivoRepository repository,
+            ContratoRepository contratoRepository,
+            AuditoriaService auditoriaService
+    ) {
         this.repository = repository;
         this.contratoRepository = contratoRepository;
+        this.auditoriaService = auditoriaService;
     }
 
     public List<ContratoArquivoResponse> listarPorContrato(Long contratoId) {
@@ -67,7 +73,10 @@ public class ContratoArquivoService {
             throw new BusinessException("Não foi possível ler o arquivo enviado.");
         }
 
-        return toResponse(repository.save(entidade));
+        ContratoArquivo salvo = repository.save(entidade);
+        auditoriaService.registrar("CONTRATO_ARQUIVO", salvo.getId(), "FILE_UPLOAD",
+                "Arquivo enviado para contrato " + contrato.getNome() + ": " + salvo.getNome());
+        return toResponse(salvo);
     }
 
     private ContratoArquivoResponse toResponse(ContratoArquivo arquivo) {

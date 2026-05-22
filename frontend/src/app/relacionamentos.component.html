@@ -1,31 +1,23 @@
 <section class="relationship-shell">
   <header class="relationship-header">
     <div class="relationship-copy">
-      <p class="relationship-kicker">Relacionamentos</p>
-      <h1>Painel de Relacionamentos</h1>
-      <p>Leitura executiva dos vinculos entre contratos, servicos, versoes e setores.</p>
-      <small class="relationship-note">
-        Edicoes administrativas ficam em Cadastros.
-      </small>
-      <span class="relationship-status">{{ saudacaoPainel() }}</span>
+      <h1>Painel de relacionamentos</h1>
+      <p>Mapa operacional consolidado.</p>
     </div>
 
     <div class="relationship-actions">
-      @if (ehAdmin()) {
-        <div class="admin-action">
-          <a routerLink="/cadastros" class="secondary-action">Ir para Cadastros</a>
-          <small>Area administrativa</small>
-        </div>
-      }
       <button type="button" class="primary-action" (click)="carregarPainel()" [disabled]="carregando()">
         {{ carregando() ? 'Atualizando...' : 'Atualizar leitura' }}
       </button>
+      @if (ehAdmin()) {
+        <a routerLink="/cadastros" class="secondary-action">Gerenciar base</a>
+      }
     </div>
   </header>
 
   @if (erro()) {
     <article class="relationship-state error">{{ erro() }}</article>
-  } @else if (painel(); as painelAtual) {
+  } @else if (painelVisual(); as painelAtual) {
     <app-resumo-cards [resumo]="painelAtual.resumo" />
 
     <app-filtros-operacionais

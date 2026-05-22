@@ -39,6 +39,9 @@ class ContratoServicoServiceTest {
     @Spy
     private ContratoServicoMapper contratoServicoMapper;
 
+    @Mock
+    private AuditoriaService auditoriaService;
+
     @InjectMocks
     private ContratoServicoService service;
 

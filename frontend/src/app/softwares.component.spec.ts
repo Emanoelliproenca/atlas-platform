@@ -52,16 +52,15 @@ describe('SoftwaresComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Softwares');
-    expect(compiled.textContent).toContain('Consulta de versao');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Sistemas e serviços digitais');
+    expect(compiled.textContent).toContain('Consulta de versão');
     expect(compiled.textContent).toContain('atlas-demo-agent.jar');
     expect(compiled.textContent).toContain('1.0.8');
-    expect(compiled.textContent).toContain('Disponivel');
-    expect(compiled.textContent).toContain('Repositorio demo ATLAS');
-    expect(compiled.textContent).toContain('Baixar versao mais recente');
+    expect(compiled.textContent).toContain('Disponível');
+    expect(compiled.textContent).toContain('Base operacional ATLAS');
   });
 
-  it('mostra estado vazio quando nenhum software existe', async () => {
+  it('mostra estado vazio quando nenhum software vem da API', async () => {
     await TestBed.configureTestingModule({
       imports: [SoftwaresComponent],
       providers: [
@@ -84,7 +83,12 @@ describe('SoftwaresComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Nenhum software mapeado no momento.');
+    const content = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(content).toContain('Sistemas mapeados0');
+    expect(content).toContain('Atualizados0');
+    expect(content).toContain('Pendentes de revisão0');
+    expect(content).toContain('Dados carregados em-');
+    expect(content).toContain('Nenhum sistema encontrado');
   });
 
   it('mostra erro fallback quando a carga falha', async () => {
@@ -105,7 +109,7 @@ describe('SoftwaresComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Nao foi possivel carregar os softwares.');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Não foi possível carregar os sistemas.');
   });
 
   it('limpa sessao e mostra mensagem padrao em 401', async () => {

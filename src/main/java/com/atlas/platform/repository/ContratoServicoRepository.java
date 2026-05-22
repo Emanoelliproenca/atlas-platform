@@ -10,6 +10,12 @@ public interface ContratoServicoRepository extends JpaRepository<ContratoServico
 
     boolean existsByContratoIdAndServicoId(Long contratoId, Long servicoId);
 
+    long countByAtivoTrue();
+
+    boolean existsByContratoIdAndAtivoTrue(Long contratoId);
+
+    boolean existsByServicoIdAndAtivoTrue(Long servicoId);
+
     Optional<ContratoServico> findByContratoIdAndServicoId(Long contratoId, Long servicoId);
 
     List<ContratoServico> findByAtivo(Boolean ativo);

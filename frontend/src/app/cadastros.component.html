@@ -2,20 +2,20 @@
   @if (!ehAdmin()) {
     <article class="restricted-card">
       <span class="restricted-badge">Acesso restrito</span>
-      <h2>Voce nao tem permissao para acessar esta area.</h2>
-      <p>A pagina Cadastros e exclusiva para usuarios ADMIN.</p>
-      <button type="button" class="primary-button" (click)="voltarParaHome()">Voltar para Home</button>
+      <h2>Você não tem permissão para acessar esta área.</h2>
+      <p>A página Cadastros é exclusiva para usuários administradores.</p>
+      <button type="button" class="primary-button" (click)="voltarParaHome()">Voltar para o início</button>
     </article>
   } @else {
     <header class="admin-header">
       <div class="admin-header-copy">
-        <h1>Gestao de Relacionamentos</h1>
+        <h1>Gestão da base operacional</h1>
         <p class="header-copy">
-          Base administrativa de contratos, servicos e vinculos.
+          Administre contratos, serviços digitais e vínculos que alimentam o painel ATLAS.
         </p>
       </div>
 
-      <span class="admin-badge">Area administrativa</span>
+      <span class="admin-badge">Área administrativa</span>
     </header>
 
     <section class="summary-grid">
@@ -29,7 +29,7 @@
       <article class="summary-card">
         <span class="summary-icon">◩</span>
         <div>
-          <p>Servicos</p>
+          <p>Serviços</p>
           <strong>{{ servicosAtivosCount() }}</strong>
         </div>
       </article>
@@ -49,7 +49,7 @@
       </article>
     </section>
 
-    <nav class="tabs-bar" aria-label="Area administrativa">
+    <nav class="tabs-bar" aria-label="Área administrativa">
       @for (aba of abas; track aba.id) {
         <button
           type="button"
@@ -75,85 +75,93 @@
         <div class="panel-top">
           <div class="panel-heading">
             <h2>Contratos cadastrados</h2>
-            <p>Organizacoes ficticias, grupos e documentacao operacional.</p>
+            <p>Organizações fictícias, grupos, endereços demonstrativos e documentação operacional.</p>
           </div>
+          <button type="button" class="accent-button section-primary-action" (click)="abrirDrawerContrato('novo')">
+            <span aria-hidden="true">＋</span>
+            Novo contrato
+          </button>
         </div>
-
-        <section class="panel-zone">
-          <div class="zone-header">
-            <button type="button" class="accent-button" (click)="abrirDrawerContrato('novo')">+ Novo contrato</button>
-          </div>
 
         <div class="filters-grid contracts">
           <label>
             <span>Buscar por nome</span>
-            <input [ngModel]="contratoFiltroNome()" (ngModelChange)="contratoFiltroNome.set($event)" placeholder="Nome do contrato" />
+            <input aria-label="Buscar por nome" [ngModel]="contratoFiltroNome()" (ngModelChange)="contratoFiltroNome.set($event)" placeholder="Buscar contrato" />
           </label>
           <label>
             <span>Grupo</span>
-            <select [ngModel]="contratoFiltroGrupo()" (ngModelChange)="contratoFiltroGrupo.set($event)">
-              <option value="">Todos</option>
+            <mat-form-field appearance="outline" class="atlas-select-field">
+            <mat-select aria-label="Filtrar por grupo" [ngModel]="contratoFiltroGrupo()" (ngModelChange)="contratoFiltroGrupo.set($event)" panelClass="atlas-select-panel">
+              <mat-option value="">Todos os grupos</mat-option>
               @for (grupo of gruposDisponiveis(); track grupo) {
-                <option [value]="grupo">{{ grupo }}</option>
+                <mat-option [value]="grupo">{{ grupo }}</mat-option>
               }
-            </select>
+            </mat-select>
+            </mat-form-field>
           </label>
           <label>
-            <span>Status</span>
-            <select [ngModel]="contratoFiltroStatus()" (ngModelChange)="contratoFiltroStatus.set($event)">
-              <option value="todos">Todos</option>
-              <option value="ativos">Ativos</option>
-              <option value="inativos">Inativos</option>
-            </select>
+            <span>Situação</span>
+            <mat-form-field appearance="outline" class="atlas-select-field">
+            <mat-select aria-label="Filtrar por situação" [ngModel]="contratoFiltroStatus()" (ngModelChange)="contratoFiltroStatus.set($event)" panelClass="atlas-select-panel">
+              <mat-option value="todos">Todos os status</mat-option>
+              <mat-option value="ativos">Ativos</mat-option>
+              <mat-option value="inativos">Inativos</mat-option>
+            </mat-select>
+            </mat-form-field>
           </label>
           <div class="filter-actions">
-            <button type="button" class="primary-button compact" (click)="noop()">Buscar</button>
             <button type="button" class="ghost-button compact" (click)="limparFiltrosContrato()">Limpar filtros</button>
           </div>
         </div>
-        </section>
 
-        <section class="panel-zone">
-          <div class="zone-header">
-            <div>
-              <strong>Lista cadastrada</strong>
-            </div>
-          </div>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th class="col-name">Nome</th>
-                <th class="col-group">Grupo</th>
-                <th class="col-url">Central URL</th>
-                <th class="col-status">Status</th>
-                <th class="col-updated">Ultima atualizacao</th>
-                <th class="col-actions">Acoes</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of contratosFiltrados(); track item.id) {
-                <tr>
-                  <td class="col-name">{{ item.nome }}</td>
-                  <td class="col-group">{{ item.grupo }}</td>
-                  <td class="url-cell col-url" [title]="item.centralUrl">{{ item.centralUrl }}</td>
-                  <td class="col-status"><span class="status-badge" [class.inactive]="!item.ativo">{{ item.ativo ? 'Ativo' : 'Inativo' }}</span></td>
-                  <td class="col-updated">{{ ultimaAtualizacaoFormatada() }}</td>
-                  <td class="actions-cell col-actions">
-                    <button type="button" class="table-action" title="Visualizar contrato" aria-label="Visualizar contrato" (click)="abrirDrawerContrato('visualizar', item)">Ver</button>
-                    <button type="button" class="table-action" title="Editar contrato" aria-label="Editar contrato" (click)="abrirDrawerContrato('editar', item)">Editar</button>
-                    <button type="button" class="table-action danger" [title]="item.ativo ? 'Inativar contrato' : 'Ativar contrato'" [attr.aria-label]="item.ativo ? 'Inativar contrato' : 'Ativar contrato'" (click)="alternarContrato(item)">
-                      {{ item.ativo ? 'Inativar' : 'Ativar' }}
-                    </button>
-                  </td>
-                </tr>
-              } @empty {
-                <tr><td colspan="6" class="empty-state">Nenhum contrato cadastrado.</td></tr>
-              }
-            </tbody>
-          </table>
+        <div class="table-caption">
+          <strong>Contratos da base</strong>
+          <span>{{ contratosFiltrados().length }} registros</span>
         </div>
-        </section>
+
+        <div class="table-wrapper" tabindex="0" aria-label="Tabela de contratos cadastrados">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-name">Nome</th>
+                  <th class="col-group">Grupo</th>
+                  <th class="col-url">Endereço central</th>
+                  <th class="col-status">Situação</th>
+                  <th class="col-updated">Atualizado em</th>
+                  <th class="col-actions">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of contratosFiltrados(); track item.id) {
+                  <tr>
+                    <td class="col-name truncate-cell" [title]="item.nome">{{ item.nome }}</td>
+                    <td class="col-group truncate-cell" [title]="item.grupo">{{ item.grupo }}</td>
+                    <td class="url-cell col-url" [title]="item.centralUrl">{{ item.centralUrl }}</td>
+                    <td class="col-status"><span class="status-badge" [class.inactive]="!item.ativo">{{ item.ativo ? 'Ativo' : 'Inativo' }}</span></td>
+                    <td class="col-updated">{{ ultimaAtualizacaoFormatada() }}</td>
+                    <td class="actions-cell col-actions">
+                      <button type="button" class="table-action" title="Visualizar contrato" aria-label="Visualizar contrato" (click)="abrirDrawerContrato('visualizar', item)">
+                        <span aria-hidden="true">◌</span>
+                      </button>
+                      <button type="button" class="table-action" title="Editar contrato" aria-label="Editar contrato" (click)="abrirDrawerContrato('editar', item)">
+                        <span aria-hidden="true">✎</span>
+                      </button>
+                      <button type="button" class="table-action danger" [title]="item.ativo ? 'Inativar contrato' : 'Ativar contrato'" [attr.aria-label]="item.ativo ? 'Inativar contrato' : 'Ativar contrato'" (click)="alternarContrato(item)">
+                        <span aria-hidden="true">{{ item.ativo ? '−' : '+' }}</span>
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="6" class="empty-state">
+                      <strong>Nenhum contrato cadastrado</strong>
+                      <button type="button" class="table-action" (click)="abrirDrawerContrato('novo')">Novo contrato</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+        </div>
       </section>
       }
 
@@ -161,76 +169,80 @@
       <section class="panel-card">
         <div class="panel-top">
           <div class="panel-heading">
-            <h2>Servicos cadastrados</h2>
-            <p>Catalogo de modulos e softwares digitais.</p>
+            <h2>Serviços cadastrados</h2>
+            <p>Catálogo dos módulos que podem ser vinculados aos contratos.</p>
           </div>
+          <button type="button" class="accent-button section-primary-action" (click)="abrirDrawerServico('novo')">
+            <span aria-hidden="true">＋</span>
+            Novo serviço
+          </button>
         </div>
 
-        <section class="panel-zone">
-          <div class="zone-header">
-            <button type="button" class="accent-button" (click)="abrirDrawerServico('novo')">+ Novo servico</button>
-          </div>
         <div class="filters-grid services">
           <label>
             <span>Buscar por nome</span>
-            <input [ngModel]="servicoFiltroNome()" (ngModelChange)="servicoFiltroNome.set($event)" placeholder="Nome do servico" />
+            <input aria-label="Buscar por nome" [ngModel]="servicoFiltroNome()" (ngModelChange)="servicoFiltroNome.set($event)" placeholder="Buscar serviço" />
           </label>
           <label>
-            <span>Status</span>
-            <select [ngModel]="servicoFiltroStatus()" (ngModelChange)="servicoFiltroStatus.set($event)">
-              <option value="todos">Todos</option>
-              <option value="ativos">Ativos</option>
-              <option value="inativos">Inativos</option>
-            </select>
+            <span>Situação</span>
+            <mat-form-field appearance="outline" class="atlas-select-field">
+            <mat-select aria-label="Filtrar por situação" [ngModel]="servicoFiltroStatus()" (ngModelChange)="servicoFiltroStatus.set($event)" panelClass="atlas-select-panel">
+              <mat-option value="todos">Todos os status</mat-option>
+              <mat-option value="ativos">Ativos</mat-option>
+              <mat-option value="inativos">Inativos</mat-option>
+            </mat-select>
+            </mat-form-field>
           </label>
           <div class="filter-actions">
-            <button type="button" class="primary-button compact" (click)="noop()">Buscar</button>
             <button type="button" class="ghost-button compact" (click)="limparFiltrosServico()">Limpar filtros</button>
           </div>
         </div>
-        </section>
 
-        <section class="panel-zone">
-          <div class="zone-header">
-            <div>
-              <strong>Lista cadastrada</strong>
-            </div>
-          </div>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th class="col-name">Nome</th>
-                <th class="col-description">Descricao</th>
-                <th class="col-status">Status</th>
-                <th class="col-linked">Contratos vinculados</th>
-                <th class="col-updated">Ultima atualizacao</th>
-                <th class="col-actions">Acoes</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of servicosFiltrados(); track item.id) {
-                <tr>
-                  <td class="col-name">{{ item.nome }}</td>
-                  <td class="truncate-cell col-description" [title]="item.descricaoSoftware || '-'">{{ item.descricaoSoftware || '-' }}</td>
-                  <td class="col-status"><span class="status-badge" [class.inactive]="!item.ativo">{{ item.ativo ? 'Ativo' : 'Inativo' }}</span></td>
-                  <td class="col-linked">{{ totalContratosPorServico(item.id) }}</td>
-                  <td class="col-updated">{{ ultimaAtualizacaoFormatada() }}</td>
-                  <td class="actions-cell col-actions">
-                    <button type="button" class="table-action" title="Visualizar servico" aria-label="Visualizar servico" (click)="abrirDrawerServico('visualizar', item)">Ver</button>
-                    <button type="button" class="table-action" title="Editar servico" aria-label="Editar servico" (click)="abrirDrawerServico('editar', item)">Editar</button>
-                    <button type="button" class="table-action danger" [title]="item.ativo ? 'Inativar servico' : 'Ativar servico'" [attr.aria-label]="item.ativo ? 'Inativar servico' : 'Ativar servico'" (click)="alternarServico(item)">
-                      {{ item.ativo ? 'Inativar' : 'Ativar' }}
-                    </button>
-                  </td>
-                </tr>
-              } @empty {
-                <tr><td colspan="6" class="empty-state">Nenhum servico cadastrado.</td></tr>
-              }
-            </tbody>
-          </table>
+        <div class="table-caption">
+          <strong>Serviços disponíveis</strong>
+          <span>{{ servicosFiltrados().length }} registros</span>
         </div>
-        </section>
+
+        <div class="table-wrapper" tabindex="0" aria-label="Tabela de serviços cadastrados">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-name">Nome</th>
+                  <th class="col-version">Versão</th>
+                  <th class="col-description">Descrição</th>
+                  <th class="col-status">Situação</th>
+                  <th class="col-linked">Contratos vinculados</th>
+                  <th class="col-updated">Atualizado em</th>
+                  <th class="col-actions">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of servicosFiltrados(); track item.id) {
+                  <tr>
+                    <td class="col-name truncate-cell" [title]="item.nome">{{ item.nome }}</td>
+                    <td class="col-version">{{ item.versaoReferencia || '-' }}</td>
+                    <td class="truncate-cell col-description" [title]="item.descricaoSoftware || '-'">{{ item.descricaoSoftware || '-' }}</td>
+                    <td class="col-status"><span class="status-badge" [class.inactive]="!item.ativo">{{ item.ativo ? 'Ativo' : 'Inativo' }}</span></td>
+                    <td class="col-linked">{{ totalContratosPorServico(item.id) }}</td>
+                    <td class="col-updated">{{ ultimaAtualizacaoFormatada() }}</td>
+                    <td class="actions-cell col-actions">
+                      <button type="button" class="table-action" title="Visualizar serviço" aria-label="Visualizar serviço" (click)="abrirDrawerServico('visualizar', item)">
+                        <span aria-hidden="true">◌</span>
+                      </button>
+                      <button type="button" class="table-action" title="Editar serviço" aria-label="Editar serviço" (click)="abrirDrawerServico('editar', item)">
+                        <span aria-hidden="true">✎</span>
+                      </button>
+                      <button type="button" class="table-action danger" [title]="item.ativo ? 'Inativar serviço' : 'Ativar serviço'" [attr.aria-label]="item.ativo ? 'Inativar serviço' : 'Ativar serviço'" (click)="alternarServico(item)">
+                        <span aria-hidden="true">{{ item.ativo ? '−' : '+' }}</span>
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="7" class="empty-state">Nenhum serviço cadastrado.</td></tr>
+                }
+              </tbody>
+            </table>
+        </div>
       </section>
       }
 
@@ -238,99 +250,107 @@
       <section class="panel-card">
         <div class="panel-top">
           <div class="panel-heading">
-            <h2>Relacionamentos contrato-servico</h2>
-            <p>Matriz de servicos, versoes e setores.</p>
+            <h2>Relacionamentos entre contratos e serviços</h2>
+            <p>Matriz que conecta contrato, serviço, versão, setor responsável e observações.</p>
           </div>
+          <button type="button" class="accent-button section-primary-action" (click)="abrirDrawerRelacionamento('novo')">
+            <span aria-hidden="true">＋</span>
+            Novo relacionamento
+          </button>
         </div>
 
-        <section class="panel-zone">
-          <div class="zone-header">
-            <button type="button" class="accent-button" (click)="abrirDrawerRelacionamento('novo')">+ Novo relacionamento</button>
-          </div>
         <div class="filters-grid relationships">
           <label>
             <span>Contrato</span>
-            <select [ngModel]="relacionamentoFiltroContratoId()" (ngModelChange)="relacionamentoFiltroContratoId.set($event)">
-              <option [ngValue]="0">Todos</option>
+            <mat-form-field appearance="outline" class="atlas-select-field">
+            <mat-select aria-label="Filtrar por contrato" [ngModel]="relacionamentoFiltroContratoId()" (ngModelChange)="relacionamentoFiltroContratoId.set($event)" panelClass="atlas-select-panel">
+              <mat-option [value]="0">Todos os contratos</mat-option>
               @for (item of contratos(); track item.id) {
-                <option [ngValue]="item.id">{{ item.nome }}</option>
+                <mat-option [value]="item.id">{{ item.nome }}</mat-option>
               }
-            </select>
+            </mat-select>
+            </mat-form-field>
           </label>
           <label>
-            <span>Servico</span>
-            <select [ngModel]="relacionamentoFiltroServicoId()" (ngModelChange)="relacionamentoFiltroServicoId.set($event)">
-              <option [ngValue]="0">Todos</option>
+            <span>Serviço</span>
+            <mat-form-field appearance="outline" class="atlas-select-field">
+            <mat-select aria-label="Filtrar por serviço" [ngModel]="relacionamentoFiltroServicoId()" (ngModelChange)="relacionamentoFiltroServicoId.set($event)" panelClass="atlas-select-panel">
+              <mat-option [value]="0">Todos os serviços</mat-option>
               @for (item of servicos(); track item.id) {
-                <option [ngValue]="item.id">{{ item.nome }}</option>
+                <mat-option [value]="item.id">{{ item.nome }}</mat-option>
               }
-            </select>
+            </mat-select>
+            </mat-form-field>
           </label>
           <label>
             <span>Setor</span>
-            <select [ngModel]="relacionamentoFiltroSetor()" (ngModelChange)="relacionamentoFiltroSetor.set($event)">
-              <option value="">Todos</option>
+            <mat-form-field appearance="outline" class="atlas-select-field">
+            <mat-select aria-label="Filtrar por setor" [ngModel]="relacionamentoFiltroSetor()" (ngModelChange)="relacionamentoFiltroSetor.set($event)" panelClass="atlas-select-panel">
+              <mat-option value="">Todos os setores</mat-option>
               @for (item of setoresDisponiveis(); track item) {
-                <option [value]="item">{{ item }}</option>
+                <mat-option [value]="item">{{ item }}</mat-option>
               }
-            </select>
+            </mat-select>
+            </mat-form-field>
           </label>
           <label>
-            <span>Status</span>
-            <select [ngModel]="relacionamentoFiltroStatus()" (ngModelChange)="relacionamentoFiltroStatus.set($event)">
-              <option value="todos">Todos</option>
-              <option value="ativos">Ativos</option>
-              <option value="inativos">Inativos</option>
-            </select>
+            <span>Situação</span>
+            <mat-form-field appearance="outline" class="atlas-select-field">
+            <mat-select aria-label="Filtrar por situação" [ngModel]="relacionamentoFiltroStatus()" (ngModelChange)="relacionamentoFiltroStatus.set($event)" panelClass="atlas-select-panel">
+              <mat-option value="todos">Todos os status</mat-option>
+              <mat-option value="ativos">Ativos</mat-option>
+              <mat-option value="inativos">Inativos</mat-option>
+            </mat-select>
+            </mat-form-field>
           </label>
           <div class="filter-actions">
-            <button type="button" class="primary-button compact" (click)="noop()">Buscar</button>
             <button type="button" class="ghost-button compact" (click)="limparFiltrosRelacionamento()">Limpar filtros</button>
           </div>
         </div>
-        </section>
 
-        <section class="panel-zone">
-          <div class="zone-header">
-            <div>
-              <strong>Lista cadastrada</strong>
-            </div>
-          </div>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th class="col-name">Contrato</th>
-                <th class="col-name">Servico</th>
-                <th class="col-version">Versao</th>
-                <th class="col-group">Setor</th>
-                <th class="col-status">Status</th>
-                <th class="col-actions">Acoes</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of relacionamentosFiltrados(); track item.id) {
-                <tr>
-                  <td class="col-name">{{ item.contratoNome }}</td>
-                  <td class="col-name">{{ item.servicoNome }}</td>
-                  <td class="col-version">{{ item.versao || '-' }}</td>
-                  <td class="col-group">{{ item.setor || '-' }}</td>
-                  <td class="col-status"><span class="status-badge" [class.inactive]="!item.ativo">{{ item.ativo ? 'Ativo' : 'Inativo' }}</span></td>
-                  <td class="actions-cell col-actions">
-                    <button type="button" class="table-action" title="Visualizar relacionamento" aria-label="Visualizar relacionamento" (click)="abrirDrawerRelacionamento('visualizar', item)">Ver</button>
-                    <button type="button" class="table-action" title="Editar relacionamento" aria-label="Editar relacionamento" (click)="abrirDrawerRelacionamento('editar', item)">Editar</button>
-                    <button type="button" class="table-action danger" [title]="item.ativo ? 'Inativar relacionamento' : 'Ativar relacionamento'" [attr.aria-label]="item.ativo ? 'Inativar relacionamento' : 'Ativar relacionamento'" (click)="alternarRelacionamento(item)">
-                      {{ item.ativo ? 'Inativar' : 'Ativar' }}
-                    </button>
-                  </td>
-                </tr>
-              } @empty {
-                <tr><td colspan="6" class="empty-state">Nenhum vinculo configurado.</td></tr>
-              }
-            </tbody>
-          </table>
+        <div class="table-caption">
+          <strong>Vínculos operacionais</strong>
+          <span>{{ relacionamentosFiltrados().length }} registros</span>
         </div>
-        </section>
+
+        <div class="table-wrapper" tabindex="0" aria-label="Tabela de vínculos operacionais">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-name">Contrato</th>
+                  <th class="col-name">Serviço</th>
+                  <th class="col-version">Versão</th>
+                  <th class="col-group">Setor</th>
+                  <th class="col-status">Situação</th>
+                  <th class="col-actions">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of relacionamentosFiltrados(); track item.id) {
+                  <tr>
+                    <td class="col-name truncate-cell" [title]="item.contratoNome">{{ item.contratoNome }}</td>
+                    <td class="col-name truncate-cell" [title]="item.servicoNome">{{ item.servicoNome }}</td>
+                    <td class="col-version">{{ item.versao || '-' }}</td>
+                    <td class="col-group truncate-cell" [title]="item.setor || '-'">{{ item.setor || '-' }}</td>
+                    <td class="col-status"><span class="status-badge" [class.inactive]="!item.ativo">{{ item.ativo ? 'Ativo' : 'Inativo' }}</span></td>
+                    <td class="actions-cell col-actions">
+                      <button type="button" class="table-action" title="Visualizar relacionamento" aria-label="Visualizar relacionamento" (click)="abrirDrawerRelacionamento('visualizar', item)">
+                        <span aria-hidden="true">◌</span>
+                      </button>
+                      <button type="button" class="table-action" title="Editar relacionamento" aria-label="Editar relacionamento" (click)="abrirDrawerRelacionamento('editar', item)">
+                        <span aria-hidden="true">✎</span>
+                      </button>
+                      <button type="button" class="table-action danger" [title]="item.ativo ? 'Inativar relacionamento' : 'Ativar relacionamento'" [attr.aria-label]="item.ativo ? 'Inativar relacionamento' : 'Ativar relacionamento'" (click)="alternarRelacionamento(item)">
+                        <span aria-hidden="true">{{ item.ativo ? '−' : '+' }}</span>
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="6" class="empty-state">Nenhum relacionamento encontrado.</td></tr>
+                }
+              </tbody>
+            </table>
+        </div>
       </section>
       }
 
@@ -348,16 +368,23 @@
         <div class="drawer-body">
           @if (drawerEntidade() === 'contrato') {
             <label class="drawer-field">
-              <span>Nome do contrato</span>
+              <span>Nome do contrato <em>obrigatório</em></span>
               <input [(ngModel)]="contratoForm.nome" [disabled]="drawerSomenteLeitura()" />
+              @if (!drawerSomenteLeitura() && !contratoForm.nome.trim()) {
+                <small class="field-hint error">Informe o nome do contrato.</small>
+              }
             </label>
             <label class="drawer-field">
-              <span>Grupo</span>
+              <span>Grupo <em>obrigatório</em></span>
               <input [(ngModel)]="contratoForm.grupo" [disabled]="drawerSomenteLeitura()" />
+              @if (!drawerSomenteLeitura() && !contratoForm.grupo.trim()) {
+                <small class="field-hint error">Informe o grupo responsável.</small>
+              }
             </label>
             <label class="drawer-field">
-              <span>Central URL</span>
+              <span>Endereço central</span>
               <input [(ngModel)]="contratoForm.centralUrl" [disabled]="drawerSomenteLeitura()" />
+              <small class="field-hint">Use uma referência operacional segura para identificação interna.</small>
             </label>
             <label class="drawer-field">
               <span>Particularidades</span>
@@ -369,67 +396,92 @@
               ></textarea>
             </label>
             <label class="drawer-field">
-              <span>Documentacao</span>
+              <span>Documentação</span>
               <textarea
                 [(ngModel)]="contratoForm.documentacao"
                 rows="5"
                 [disabled]="drawerSomenteLeitura()"
-                placeholder="Cole aqui informacoes importantes, links, procedimentos ou observacoes tecnicas."
+                placeholder="Cole aqui informações importantes, links, procedimentos ou observações técnicas."
               ></textarea>
             </label>
             <label class="drawer-field drawer-switch">
-              <span>Status</span>
-              <select [(ngModel)]="contratoForm.ativo" [disabled]="drawerSomenteLeitura()">
-                <option [ngValue]="true">Ativo</option>
-                <option [ngValue]="false">Inativo</option>
-              </select>
+              <span>Situação</span>
+              <mat-form-field appearance="outline" class="atlas-select-field">
+              <mat-select [(ngModel)]="contratoForm.ativo" [disabled]="drawerSomenteLeitura()" panelClass="atlas-select-panel">
+                <mat-option [value]="true">Ativo</mat-option>
+                <mat-option [value]="false">Inativo</mat-option>
+              </mat-select>
+              </mat-form-field>
             </label>
           }
 
           @if (drawerEntidade() === 'servico') {
             <label class="drawer-field">
-              <span>Nome do servico</span>
+              <span>Nome do serviço <em>obrigatório</em></span>
               <input [(ngModel)]="servicoForm.nome" [disabled]="drawerSomenteLeitura()" />
+              @if (!drawerSomenteLeitura() && !servicoForm.nome.trim()) {
+                <small class="field-hint error">Informe o nome do serviço.</small>
+              }
             </label>
             <label class="drawer-field">
-              <span>Descricao</span>
+              <span>Descrição</span>
               <textarea
                 [(ngModel)]="servicoForm.descricaoSoftware"
                 rows="6"
                 [disabled]="drawerSomenteLeitura()"
-                placeholder="Descreva a finalidade, uso ou contexto tecnico deste servico."
+                placeholder="Descreva a finalidade, uso ou contexto técnico deste serviço."
               ></textarea>
             </label>
+            <label class="drawer-field">
+              <span>Versão de referência</span>
+              <input [(ngModel)]="servicoForm.versaoReferencia" [disabled]="drawerSomenteLeitura()" placeholder="Ex: 2026.4" />
+            </label>
+            <label class="drawer-field">
+              <span>Link operacional</span>
+              <input [(ngModel)]="servicoForm.linkSoftware" [disabled]="drawerSomenteLeitura()" placeholder="https://software.example.invalid" />
+            </label>
             <label class="drawer-field drawer-switch">
-              <span>Status</span>
-              <select [(ngModel)]="servicoForm.ativo" [disabled]="drawerSomenteLeitura()">
-                <option [ngValue]="true">Ativo</option>
-                <option [ngValue]="false">Inativo</option>
-              </select>
+              <span>Situação</span>
+              <mat-form-field appearance="outline" class="atlas-select-field">
+              <mat-select [(ngModel)]="servicoForm.ativo" [disabled]="drawerSomenteLeitura()" panelClass="atlas-select-panel">
+                <mat-option [value]="true">Ativo</mat-option>
+                <mat-option [value]="false">Inativo</mat-option>
+              </mat-select>
+              </mat-form-field>
             </label>
           }
 
           @if (drawerEntidade() === 'relacionamento') {
             <label class="drawer-field">
-              <span>Contrato</span>
-              <select [(ngModel)]="relacionamentoForm.contratoId" [disabled]="drawerSomenteLeitura()">
-                <option [ngValue]="0">Selecione</option>
+              <span>Contrato <em>obrigatório</em></span>
+              <mat-form-field appearance="outline" class="atlas-select-field">
+              <mat-select [(ngModel)]="relacionamentoForm.contratoId" [disabled]="drawerSomenteLeitura()" panelClass="atlas-select-panel">
+                <mat-option [value]="0">Selecione</mat-option>
                 @for (item of contratosAtivos(); track item.id) {
-                  <option [ngValue]="item.id">{{ item.nome }}</option>
+                  <mat-option [value]="item.id">{{ item.nome }}</mat-option>
                 }
-              </select>
+              </mat-select>
+              </mat-form-field>
+              @if (!drawerSomenteLeitura() && relacionamentoForm.contratoId <= 0) {
+                <small class="field-hint error">Selecione um contrato ativo.</small>
+              }
             </label>
             <label class="drawer-field">
-              <span>Servico</span>
-              <select [(ngModel)]="relacionamentoForm.servicoId" [disabled]="drawerSomenteLeitura()">
-                <option [ngValue]="0">Selecione</option>
+              <span>Serviço <em>obrigatório</em></span>
+              <mat-form-field appearance="outline" class="atlas-select-field">
+              <mat-select [(ngModel)]="relacionamentoForm.servicoId" [disabled]="drawerSomenteLeitura()" panelClass="atlas-select-panel">
+                <mat-option [value]="0">Selecione</mat-option>
                 @for (item of servicosAtivos(); track item.id) {
-                  <option [ngValue]="item.id">{{ item.nome }}</option>
+                  <mat-option [value]="item.id">{{ item.nome }}</mat-option>
                 }
-              </select>
+              </mat-select>
+              </mat-form-field>
+              @if (!drawerSomenteLeitura() && relacionamentoForm.servicoId <= 0) {
+                <small class="field-hint error">Selecione um serviço ativo.</small>
+              }
             </label>
             <label class="drawer-field">
-              <span>Versao</span>
+              <span>Versão</span>
               <input [(ngModel)]="relacionamentoForm.versao" [disabled]="drawerSomenteLeitura()" placeholder="Ex: 1.0.3" />
             </label>
             <label class="drawer-field">
@@ -437,20 +489,22 @@
               <input [(ngModel)]="relacionamentoForm.setor" [disabled]="drawerSomenteLeitura()" placeholder="Suporte, N3, Implantacao, Desenvolvimento, P&D" />
             </label>
             <label class="drawer-field">
-              <span>Observacao</span>
+              <span>Observação</span>
               <textarea
                 [(ngModel)]="relacionamentoForm.observacao"
                 rows="6"
                 [disabled]="drawerSomenteLeitura()"
-                placeholder="Descreva como esse servico se aplica a este contrato, incluindo particularidades, alertas ou procedimentos importantes."
+                placeholder="Descreva como esse serviço se aplica a este contrato, incluindo particularidades, alertas ou procedimentos importantes."
               ></textarea>
             </label>
             <label class="drawer-field drawer-switch">
-              <span>Status</span>
-              <select [(ngModel)]="relacionamentoForm.ativo" [disabled]="drawerSomenteLeitura()">
-                <option [ngValue]="true">Ativo</option>
-                <option [ngValue]="false">Inativo</option>
-              </select>
+              <span>Situação</span>
+              <mat-form-field appearance="outline" class="atlas-select-field">
+              <mat-select [(ngModel)]="relacionamentoForm.ativo" [disabled]="drawerSomenteLeitura()" panelClass="atlas-select-panel">
+                <mat-option [value]="true">Ativo</mat-option>
+                <mat-option [value]="false">Inativo</mat-option>
+              </mat-select>
+              </mat-form-field>
             </label>
           }
         </div>

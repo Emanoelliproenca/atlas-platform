@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { Observable, finalize, forkJoin } from 'rxjs';
 import { ApiFeedbackService } from './api-feedback.service';
@@ -46,18 +48,18 @@ import {
 } from './painel-operacional-api';
 
 const MENSAGEM_REGISTRO_SALVO = 'Registro salvo com sucesso.';
-const MENSAGEM_ALTERACOES_SALVAS = 'Alteracoes salvas com sucesso.';
+const MENSAGEM_ALTERACOES_SALVAS = 'Alterações salvas com sucesso.';
 const MENSAGEM_REGISTRO_ATIVADO = 'Registro ativado com sucesso.';
 const MENSAGEM_REGISTRO_INATIVADO = 'Registro inativado com sucesso.';
-const MENSAGEM_OPERACAO_INVALIDA = 'Nao foi possivel concluir a operacao. Verifique os dados e tente novamente.';
+const MENSAGEM_OPERACAO_INVALIDA = 'Não foi possível concluir a operação. Verifique os dados e tente novamente.';
 const MENSAGEM_RELACIONAMENTO_DUPLICADO =
-  'Nao foi possivel concluir a operacao. Este servico ja esta vinculado a este contrato.';
-const MENSAGEM_CARGA_ADMINISTRATIVA = 'Nao foi possivel carregar a base administrativa.';
+  'Não foi possível concluir a operação. Este serviço já está vinculado a este contrato.';
+const MENSAGEM_CARGA_ADMINISTRATIVA = 'Não foi possível carregar a base administrativa.';
 
 @Component({
   selector: 'app-cadastros',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatSelectModule],
   templateUrl: './cadastros.component.html',
   styleUrl: './cadastros.component.scss'
 })
@@ -100,8 +102,8 @@ export class CadastrosComponent {
   protected readonly ehAdmin = computed(() => this.authSession.session()?.roles.includes('ROLE_ADMIN') ?? false);
   protected readonly contratosAtivos = computed(() => this.contratos().filter((item) => item.ativo));
   protected readonly servicosAtivos = computed(() => this.servicos().filter((item) => item.ativo));
-  protected readonly contratosAtivosCount = computed(() => this.contratosAtivos().length);
-  protected readonly servicosAtivosCount = computed(() => this.servicosAtivos().length);
+  protected readonly contratosAtivosCount = computed(() => this.contratos().filter((item) => item.ativo).length);
+  protected readonly servicosAtivosCount = computed(() => this.servicos().filter((item) => item.ativo).length);
   protected readonly relacionamentosAtivosCount = computed(() => this.relacionamentos().filter((item) => item.ativo).length);
   protected readonly inativosCount = computed(() => contarInativos(this.contratos(), this.servicos(), this.relacionamentos()));
   protected readonly gruposDisponiveis = computed(() => gruposOrdenados(this.contratos()));
@@ -156,7 +158,7 @@ export class CadastrosComponent {
 
   protected drawerBotaoSalvar(): string {
     return this.drawerModo() === 'editar'
-      ? 'Salvar alteracoes'
+      ? 'Salvar alterações'
       : `Salvar ${this.drawerEntidade()}`;
   }
 
@@ -264,10 +266,6 @@ export class CadastrosComponent {
 
   protected voltarParaHome(): void {
     this.router.navigateByUrl('/');
-  }
-
-  protected noop(): void {
-    // Os filtros sao reativos; este botao existe para manter a hierarquia visual pedida.
   }
 
   private abrirDrawer(): void {

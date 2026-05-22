@@ -33,6 +33,12 @@ class ContratoServiceTest {
     @Spy
     private ContratoMapper contratoMapper;
 
+    @Mock
+    private ContratoArquivoService contratoArquivoService;
+
+    @Mock
+    private AuditoriaService auditoriaService;
+
     @InjectMocks
     private ContratoService service;
 

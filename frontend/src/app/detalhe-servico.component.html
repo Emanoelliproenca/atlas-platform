@@ -1,14 +1,14 @@
 <section class="detail-shell">
   <app-page-header
-    eyebrow="Pagina do servico"
-    title="Detalhe operacional do servico"
-    copy="Leia rapidamente onde o servico aparece, qual versao esta em uso e em quais contratos ele impacta a operacao."
+    eyebrow="Página do serviço"
+    title="Detalhe operacional do serviço"
+    copy="Leia rapidamente onde o serviço aparece, qual versão está em uso e em quais contratos ele impacta a operação."
     backLabel="Voltar para o painel"
     backLink="/relacionamentos"
   />
 
   @if (carregando()) {
-    <div class="info-card">Carregando detalhe do servico...</div>
+    <div class="info-card">Carregando detalhe do serviço...</div>
   } @else if (erro()) {
     <div class="info-card error-card">{{ erro() }}</div>
   } @else if (detalhe(); as dados) {
@@ -18,26 +18,26 @@
 
     <div class="hero-grid">
       <article class="info-card spotlight">
-        <p class="section-eyebrow">Servico</p>
+        <p class="section-eyebrow">Serviço</p>
         <h3>{{ dados.servico.nome }}</h3>
         <dl class="meta-grid">
           <div>
-            <dt>Status</dt>
+            <dt>Situação</dt>
             <dd>{{ dados.servico.ativo ? 'Ativo' : 'Inativo' }}</dd>
           </div>
           <div>
-            <dt>Descricao</dt>
+            <dt>Descrição</dt>
             <dd>{{ dados.servico.descricaoSoftware || '-' }}</dd>
           </div>
         </dl>
       </article>
 
       <article class="info-card">
-        <p class="section-eyebrow">Software</p>
-        <h3>Visao rapida de uso e referencia</h3>
+        <p class="section-eyebrow">Sistema</p>
+        <h3>Visão rápida de uso e referência</h3>
         <p>{{ resumoRelacionamento(dados.contratos.length) }}</p>
         <p>
-          Use esta tela para validar onde o servico esta ativo e qual versao aparece como referencia
+          Use esta tela para validar onde o serviço está ativo e qual versão aparece como referência
           em cada contrato.
         </p>
       </article>
@@ -47,7 +47,7 @@
       <div class="section-header">
         <div>
           <p class="section-eyebrow">Relacionamentos</p>
-          <h3>Contratos que usam este servico</h3>
+          <h3>Contratos que usam este serviço</h3>
         </div>
         <p class="table-meta">{{ dados.contratos.length }} contratos vinculados</p>
       </div>
@@ -57,10 +57,10 @@
           <thead>
             <tr>
               <th>Contrato</th>
-              <th>Versao</th>
+              <th>Versão</th>
               <th>Setor</th>
-              <th>Observacao</th>
-              <th>Acao</th>
+              <th>Observação</th>
+              <th>Ação</th>
             </tr>
           </thead>
           <tbody>
@@ -74,7 +74,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="empty-state">Este servico ainda nao esta vinculado a contratos. Assim que houver relacionamento, a matriz operacional aparece aqui.</td>
+                <td colspan="5" class="empty-state">Este serviço ainda não está vinculado a contratos. Assim que houver relacionamento, a matriz operacional aparece aqui.</td>
               </tr>
             }
           </tbody>

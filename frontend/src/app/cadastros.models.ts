@@ -19,6 +19,8 @@ export interface ServicoFormModel {
   id: number | null;
   nome: string;
   descricaoSoftware: string;
+  versaoReferencia: string;
+  linkSoftware: string;
   ativo: boolean;
 }
 
@@ -33,20 +35,20 @@ export interface RelacionamentoFormModel {
 }
 
 export const ABAS_CADASTRO: Array<{ id: AbaCadastro; label: string; hint: string }> = [
-  { id: 'contratos', label: 'Contratos', hint: 'Base SaaS' },
-  { id: 'servicos', label: 'Servicos', hint: 'Catalogo digital' },
+  { id: 'contratos', label: 'Contratos', hint: 'Base operacional' },
+  { id: 'servicos', label: 'Serviços', hint: 'Catálogo digital' },
   { id: 'relacionamentos', label: 'Relacionamentos', hint: 'Matriz operacional' }
 ];
 
 export const DRAWER_ENTITY_LABELS: Record<DrawerEntidade, string> = {
   contrato: 'contrato',
-  servico: 'servico',
+  servico: 'serviço',
   relacionamento: 'relacionamento'
 };
 
 export const DRAWER_SECTION_LABELS: Record<DrawerEntidade, string> = {
   contrato: 'Contratos',
-  servico: 'Servicos',
+  servico: 'Serviços',
   relacionamento: 'Relacionamentos'
 };
 
@@ -67,6 +69,8 @@ export function criarServicoVazio(): ServicoFormModel {
     id: null,
     nome: '',
     descricaoSoftware: '',
+    versaoReferencia: '',
+    linkSoftware: '',
     ativo: true
   };
 }
@@ -108,6 +112,8 @@ export function mapearServicoParaForm(item?: ServicoResponse): ServicoFormModel 
     id: item.id,
     nome: item.nome,
     descricaoSoftware: item.descricaoSoftware ?? '',
+    versaoReferencia: item.versaoReferencia ?? '',
+    linkSoftware: item.linkSoftware ?? '',
     ativo: item.ativo
   };
 }

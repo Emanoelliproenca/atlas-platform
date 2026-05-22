@@ -26,8 +26,8 @@ public class OpenApiConfig {
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .info(new Info()
                         .title("ATLAS API")
-                        .description("API ficticia para contratos SaaS, servicos digitais, relacionamentos e importacao de planilhas.")
+                        .description("API ficticia da Atlas Labs para contratos SaaS, servicos digitais, relacionamentos e importacao de planilhas.")
                         .version("v1")
-                        .contact(new Contact().name("Equipe ATLAS Demo")));
+                        .contact(new Contact().name("Atlas Labs")));
     }
 }

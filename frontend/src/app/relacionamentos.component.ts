@@ -7,9 +7,13 @@ import { AuthSessionService } from './auth-session.service';
 import { FiltrosOperacionaisComponent } from './components/filtros-operacionais.component';
 import { ResumoCardsComponent } from './components/resumo-cards.component';
 import { TabelaOperacionalComponent } from './components/tabela-operacional.component';
-import { PainelOperacional, PainelOperacionalApi, PainelRequest } from './painel-operacional-api';
+import {
+  PainelOperacional,
+  PainelOperacionalApi,
+  PainelRequest
+} from './painel-operacional-api';
 
-const MENSAGEM_CARGA = 'Nao foi possivel carregar os dados.';
+const MENSAGEM_CARGA = 'Não foi possível carregar os dados.';
 const MENSAGEM_AUTENTICACAO = 'Entre com suas credenciais para consultar os relacionamentos operacionais.';
 
 @Component({
@@ -42,10 +46,11 @@ export class RelacionamentosComponent {
 
   protected readonly autenticado = computed(() => this.authSession.isAuthenticated());
   protected readonly ehAdmin = computed(() => this.authSession.session()?.roles.includes('ROLE_ADMIN') ?? false);
+  protected readonly painelVisual = computed(() => this.painel());
   protected readonly saudacaoPainel = computed(() => {
     const painel = this.painel();
     if (!painel) {
-      return 'Consulte contratos, servicos, versoes e setores em uma leitura cruzada unica.';
+      return 'Consulte contratos, serviços, versões e setores em uma leitura cruzada única.';
     }
 
     if (!painel.linhas.length) {
@@ -117,12 +122,13 @@ export class RelacionamentosComponent {
 
   private formatarUltimaAtualizacao(data: Date | null): string {
     if (!data) {
-      return 'Atualizacao pendente';
+      return 'Atualização pendente';
     }
 
-    return `Ultima leitura em ${data.toLocaleDateString('pt-BR')} as ${data.toLocaleTimeString('pt-BR', {
+    return `Dados carregados em ${data.toLocaleDateString('pt-BR')} ${data.toLocaleTimeString('pt-BR', {
       hour: '2-digit',
       minute: '2-digit'
     })}`;
   }
+
 }

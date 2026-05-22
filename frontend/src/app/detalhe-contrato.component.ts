@@ -45,7 +45,7 @@ export class DetalheContratoComponent {
 
     if (!contratoId) {
       this.carregando.set(false);
-      this.erro.set('Contrato invalido.');
+      this.erro.set('Contrato inválido.');
       return;
     }
 
@@ -55,7 +55,7 @@ export class DetalheContratoComponent {
         next: (response) => {
           if (!response.sucesso || !response.dados?.contrato) {
             this.detalhe.set(null);
-            this.erro.set(response.mensagem || 'Nao foi possivel carregar o detalhe do contrato.');
+            this.erro.set(response.mensagem || 'Não foi possível carregar o detalhe do contrato.');
             return;
           }
 
@@ -70,7 +70,7 @@ export class DetalheContratoComponent {
           this.documentacao.set(detalhe.contrato.documentacao ?? '');
         },
         error: (error) => {
-          this.erro.set(this.apiFeedback.mensagem(error, 'Nao foi possivel carregar o detalhe do contrato.'));
+          this.erro.set(this.apiFeedback.mensagem(error, 'Não foi possível carregar o detalhe do contrato.'));
         }
       });
   }
@@ -101,10 +101,10 @@ export class DetalheContratoComponent {
             ...dados,
             contrato: response.dados
           });
-          this.mensagemSucesso.set('Documentacao atualizada com sucesso.');
+          this.mensagemSucesso.set('Documentação atualizada com sucesso.');
         },
         error: (error) => {
-          this.erro.set(this.apiFeedback.mensagem(error, 'Nao foi possivel salvar a documentacao do contrato.'));
+          this.erro.set(this.apiFeedback.mensagem(error, 'Não foi possível salvar a documentação do contrato.'));
         }
       });
   }
@@ -127,7 +127,7 @@ export class DetalheContratoComponent {
       .subscribe({
         next: (response) => {
           if (!response.sucesso) {
-            this.erroArquivo.set(response.mensagem || 'Nao foi possivel adicionar o arquivo.');
+            this.erroArquivo.set(response.mensagem || 'Não foi possível adicionar o arquivo.');
             return;
           }
 
@@ -137,7 +137,7 @@ export class DetalheContratoComponent {
           });
         },
         error: (error) => {
-          this.erroArquivo.set(this.apiFeedback.mensagem(error, 'Nao foi possivel adicionar o arquivo.'));
+          this.erroArquivo.set(this.apiFeedback.mensagem(error, 'Não foi possível adicionar o arquivo.'));
         }
       });
   }
@@ -155,7 +155,7 @@ export class DetalheContratoComponent {
         setTimeout(() => URL.revokeObjectURL(url), 30000);
       },
       error: (error) => {
-        this.erroArquivo.set(this.apiFeedback.mensagem(error, 'Nao foi possivel abrir o arquivo.'));
+        this.erroArquivo.set(this.apiFeedback.mensagem(error, 'Não foi possível abrir o arquivo.'));
       }
     });
   }
@@ -176,7 +176,7 @@ export class DetalheContratoComponent {
         URL.revokeObjectURL(url);
       },
       error: (error) => {
-        this.erroArquivo.set(this.apiFeedback.mensagem(error, 'Nao foi possivel baixar o arquivo.'));
+        this.erroArquivo.set(this.apiFeedback.mensagem(error, 'Não foi possível baixar o arquivo.'));
       }
     });
   }
@@ -199,12 +199,12 @@ export class DetalheContratoComponent {
     }
 
     if (this.salvando()) {
-      return 'Salvando alteracoes na documentacao do contrato.';
+      return 'Salvando alterações na documentação do contrato.';
     }
 
     return this.podeSalvarDocumentacao()
-      ? 'Existem alteracoes pendentes para salvar.'
-      : 'Edite particularidades ou documentacao para liberar o salvamento.';
+      ? 'Existem alterações pendentes para salvar.'
+      : 'Edite particularidades ou documentação para liberar o salvamento.';
   }
 
   private normalizarTexto(valor: string): string {
@@ -217,6 +217,16 @@ export class DetalheContratoComponent {
 
   protected ultimaVersao(dados: ContratoDetalhe): string {
     return ultimaVersaoRelacionada(dados.servicos);
+  }
+
+  protected ultimaAtualizacao(): string {
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(new Date());
   }
 
 }

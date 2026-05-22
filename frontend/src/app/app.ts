@@ -1,19 +1,27 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { filter, finalize } from 'rxjs';
+import { filter, finalize, forkJoin } from 'rxjs';
 import { ApiFeedbackService } from './api-feedback.service';
 import { AuthSessionService, DEFAULT_API_URL } from './auth-session.service';
 import { LoginPanelComponent } from './components/login-panel.component';
-import { PainelOperacional, PainelOperacionalApi, PainelRequest } from './painel-operacional-api';
+import { DashboardMetrics, PainelOperacional, PainelOperacionalApi, PainelRequest } from './painel-operacional-api';
 
-const MENSAGEM_LOGIN_FALHOU = 'Nao foi possivel iniciar a sessao.';
-const MENSAGEM_PAINEL_FALHOU = 'Nao foi possivel carregar o painel. Verifique a API e as credenciais.';
-const MENSAGEM_RESTAURACAO_FALHOU = 'Nao foi possivel restaurar a sessao.';
+const MENSAGEM_LOGIN_FALHOU = 'Não foi possível iniciar a sessão.';
+const MENSAGEM_PAINEL_FALHOU = 'Não foi possível carregar o painel. Verifique a API e as credenciais.';
+const MENSAGEM_RESTAURACAO_FALHOU = 'Não foi possível restaurar a sessão.';
 const MENSAGEM_AUTENTICACAO_NECESSARIA = 'Entre com suas credenciais para consultar a API.';
 const LEGACY_API_URLS = new Set([
   'http://localhost:8080',
-  'http://127.0.0.1:8080'
+  'http://127.0.0.1:8080',
+  'http://localhost:4200',
+  'http://127.0.0.1:4200',
+  'http://localhost:4300',
+  'http://127.0.0.1:4300',
+  'http://localhost:4311',
+  'http://127.0.0.1:4311',
+  'http://localhost:4312',
+  'http://127.0.0.1:4312'
 ]);
 
 @Component({
@@ -44,6 +52,7 @@ export class App {
   protected readonly servicoIds = signal<number[]>([]);
 
   protected readonly painel = signal<PainelOperacional | null>(null);
+  protected readonly dashboardMetrics = signal<DashboardMetrics | null>(null);
   protected readonly ultimaAtualizacao = signal<Date | null>(null);
   protected readonly carregando = signal(false);
   protected readonly erro = signal('');
@@ -57,14 +66,48 @@ export class App {
   protected readonly iniciaisUsuario = computed(() => this.obterIniciais(this.username()));
   protected readonly perfilUsuario = computed(() => (this.ehAdmin() ? 'Administrador' : 'Operacional'));
   protected readonly ultimaAtualizacaoFormatada = computed(() => this.formatarUltimaAtualizacao(this.ultimaAtualizacao()));
+  protected readonly homeResumo = computed(() => {
+    const metrics = this.dashboardMetrics();
+    if (metrics) {
+      return {
+        relacionamentos: metrics.totalRelacionamentos,
+        contratos: metrics.totalContratos,
+        contratosAtivos: metrics.contratosAtivos,
+        contratosInativos: metrics.contratosInativos,
+        servicos: metrics.totalServicos,
+        grupos: metrics.contratosPorGrupo.length,
+        documentacao: this.formatarPercentual(metrics.percentualContratosComDocumentacao),
+        vinculos: this.formatarPercentual(metrics.percentualContratosComServicos),
+        softwaresPendentes: metrics.softwaresDesatualizados
+      };
+    }
+
+    const resumo = this.painel()?.resumo;
+
+    return {
+      relacionamentos: resumo?.totalRelacionamentos ?? 0,
+      contratos: resumo?.totalContratos ?? 0,
+      contratosAtivos: 0,
+      contratosInativos: 0,
+      servicos: resumo?.totalServicos ?? 0,
+      grupos: resumo?.totalGrupos ?? 0,
+      documentacao: '0%',
+      vinculos: '0%',
+      softwaresPendentes: 0
+    };
+  });
+  protected readonly contratosPorGrupo = computed(() => this.dashboardMetrics()?.contratosPorGrupo.slice(0, 4) ?? []);
+  protected readonly ultimosRepasses = computed(() => this.dashboardMetrics()?.ultimosRepasses.slice(0, 4) ?? []);
+  protected readonly dashboardVazio = computed(() => !this.dashboardMetrics() && !this.painel());
+  protected readonly menuMobileAberto = signal(false);
   protected readonly saudacaoPainel = computed(() => {
     const painel = this.painel();
     if (!painel) {
-      return 'Base aguardando autenticacao para consolidar contratos, servicos e relacionamentos.';
+      return 'Base aguardando autenticação para consolidar contratos, serviços e relacionamentos.';
     }
 
     if (!painel.linhas.length) {
-      return 'Conexao valida. Ajuste os filtros para ampliar a leitura operacional.';
+      return 'Conexão válida. Ajuste os filtros para ampliar a leitura operacional.';
     }
 
     return `${painel.resumo.totalRelacionamentos} registros ativos cruzados com ${painel.resumo.totalSetores} setores.`;
@@ -100,8 +143,8 @@ export class App {
           expiraEm: response.dados.expiraEm
         });
         this.password.set('');
-        this.router.navigateByUrl('/relacionamentos');
-        this.carregarPainel();
+        this.router.navigateByUrl('/');
+        this.carregarDashboard();
       },
       error: (error) => {
         this.carregando.set(false);
@@ -114,7 +157,7 @@ export class App {
     if (this.authSession.isAuthenticated()) {
       this.api.logout().subscribe({
         error: () => {
-          // Limpa a sessao local mesmo quando a API nao responde no logout.
+          // Limpa a sessão local mesmo quando a API não responde ao sair.
         }
       });
     }
@@ -126,10 +169,12 @@ export class App {
     this.router.navigateByUrl('/login');
   }
 
-  protected usarApiPadrao(): void {
-    this.baseUrl.set(DEFAULT_API_URL);
-    this.authSession.rememberConnection(DEFAULT_API_URL, this.username());
-    this.erro.set('');
+  protected alternarMenuMobile(): void {
+    this.menuMobileAberto.set(!this.menuMobileAberto());
+  }
+
+  protected fecharMenuMobile(): void {
+    this.menuMobileAberto.set(false);
   }
 
   protected carregarPainel(): void {
@@ -153,6 +198,37 @@ export class App {
           this.erro.set(mensagem);
           if (error?.status === 401) {
             this.limparSessaoLocal();
+            this.router.navigateByUrl('/login');
+          }
+        }
+      });
+  }
+
+  protected carregarDashboard(): void {
+    if (!this.authSession.isAuthenticated()) {
+      this.erro.set(MENSAGEM_AUTENTICACAO_NECESSARIA);
+      return;
+    }
+
+    this.prepararCarregamento();
+
+    forkJoin({
+      painel: this.api.carregarPainel(this.criarFiltrosPainel()),
+      metrics: this.api.carregarDashboardMetrics()
+    })
+      .pipe(finalize(() => this.carregando.set(false)))
+      .subscribe({
+        next: ({ painel, metrics }) => {
+          this.painel.set(painel.dados);
+          this.dashboardMetrics.set(metrics.dados);
+          this.ultimaAtualizacao.set(new Date());
+        },
+        error: (error) => {
+          const mensagem = this.extrairMensagemDeErro(error, MENSAGEM_PAINEL_FALHOU);
+          this.erro.set(mensagem);
+          if (error?.status === 401) {
+            this.limparSessaoLocal();
+            this.router.navigateByUrl('/login');
           }
         }
       });
@@ -171,7 +247,7 @@ export class App {
     this.setor.set('');
     this.contratoIds.set([]);
     this.servicoIds.set([]);
-    this.carregarPainel();
+    this.carregarDashboard();
   }
 
   protected async abrirSecaoHome(secaoId: string): Promise<void> {
@@ -190,12 +266,13 @@ export class App {
     this.api.carregarSessao().subscribe({
       next: (response) => {
         this.atualizarSessaoAtiva(response.dados.username, response.dados.roles, response.dados.expiraEm);
-        this.carregarPainel();
+        this.carregarDashboard();
       },
       error: (error) => {
         this.carregando.set(false);
         this.erro.set(this.extrairMensagemDeErro(error, MENSAGEM_RESTAURACAO_FALHOU));
         this.limparSessaoLocal();
+        this.router.navigateByUrl('/login');
       }
     });
   }
@@ -237,7 +314,7 @@ export class App {
 
   private extrairMensagemDeErro(error: { status?: number; error?: { mensagem?: string } } | null | undefined, fallback: string): string {
     if (error?.status === 0) {
-      return `Nao foi possivel conectar na API em ${this.normalizeBaseUrl(this.baseUrl())}. Confirme se o backend demo esta ligado na porta 8091.`;
+      return 'Não foi possível conectar ao servidor.';
     }
 
     return this.apiFeedback.mensagem(error, fallback);
@@ -262,7 +339,7 @@ export class App {
 
   private formatarTempoRestante(expiraEm: string | null): string {
     if (!expiraEm) {
-      return 'Sem informacao de expiracao';
+      return 'Sem informação de expiração';
     }
 
     const expiracao = new Date(expiraEm).getTime();
@@ -301,12 +378,16 @@ export class App {
 
   private formatarUltimaAtualizacao(data: Date | null): string {
     if (!data) {
-      return 'Aguardando primeira leitura';
+      return 'Dados carregados em -';
     }
 
-    return new Intl.DateTimeFormat('pt-BR', {
+    return `Dados carregados em ${new Intl.DateTimeFormat('pt-BR', {
       dateStyle: 'short',
       timeStyle: 'short'
-    }).format(data);
+    }).format(data)}`;
+  }
+
+  private formatarPercentual(valor: number): string {
+    return `${Math.round(valor)}%`;
   }
 }

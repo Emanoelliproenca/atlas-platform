@@ -46,8 +46,8 @@ class PainelOperacionalServiceTest {
                 new ContratoResponse(1L, "Alpha", "Grupo A", "https://alpha-demo.example.invalid", null, null, true)
         ));
         when(servicoService.listar(true, null)).thenReturn(List.of(
-                new ServicoResponse(20L, "Beta", "Servico beta", true),
-                new ServicoResponse(10L, "Delta", "Servico delta", true)
+                new ServicoResponse(20L, "Beta", "Servico beta", null, null, true),
+                new ServicoResponse(10L, "Delta", "Servico delta", null, null, true)
         ));
 
         var resposta = service.consultar(List.of(1L), List.of(20L), "Grupo B", "Suporte", "", "");

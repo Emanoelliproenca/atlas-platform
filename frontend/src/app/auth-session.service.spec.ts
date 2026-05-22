@@ -17,7 +17,7 @@ describe('AuthSessionService', () => {
 
     service.save({
       baseUrl: 'http://localhost:8091/',
-      username: 'demo.admin',
+      username: 'admin',
       token: 'token-seguro',
       roles: ['ROLE_ADMIN'],
       expiraEm: '2026-04-23T15:00:00Z'
@@ -28,14 +28,14 @@ describe('AuthSessionService', () => {
     expect(sessionStorage.getItem('atlas.connection')).toBe(
       JSON.stringify({
         baseUrl: 'http://localhost:8091',
-        username: 'demo.admin'
+        username: 'admin'
       })
     );
     expect(localStorage.getItem('atlas.session')).toBeNull();
     expect(sessionStorage.getItem('atlas.session')).toBe(
       JSON.stringify({
         baseUrl: 'http://localhost:8091',
-        username: 'demo.admin',
+        username: 'admin',
         token: 'token-seguro',
         roles: ['ROLE_ADMIN'],
         expiraEm: '2026-04-23T15:00:00Z'
@@ -48,7 +48,7 @@ describe('AuthSessionService', () => {
       'atlas.connection',
       JSON.stringify({
         baseUrl: 'http://localhost:8091/',
-        username: 'demo.viewer'
+        username: 'viewer'
       })
     );
 
@@ -60,10 +60,31 @@ describe('AuthSessionService', () => {
 
     expect(service.preferences()).toEqual({
       baseUrl: 'http://localhost:8091',
-      username: 'demo.viewer'
+      username: 'viewer'
     });
     expect(service.isAuthenticated()).toBe(false);
     expect(service.session()).toBeNull();
+  });
+
+  it('resets frontend dev server URLs saved as API preference', () => {
+    sessionStorage.setItem(
+      'atlas.connection',
+      JSON.stringify({
+        baseUrl: 'http://127.0.0.1:4311',
+        username: 'admin'
+      })
+    );
+
+    TestBed.configureTestingModule({
+      providers: [AuthSessionService]
+    });
+
+    const service = TestBed.inject(AuthSessionService);
+
+    expect(service.preferences()).toEqual({
+      baseUrl: 'http://localhost:8091',
+      username: 'admin'
+    });
   });
 
   it('restores authenticated session from sessionStorage', () => {
@@ -71,7 +92,7 @@ describe('AuthSessionService', () => {
       'atlas.session',
       JSON.stringify({
         baseUrl: 'http://localhost:8091/',
-        username: 'demo.admin',
+        username: 'admin',
         token: 'token-seguro',
         roles: ['ROLE_ADMIN'],
         expiraEm: '2026-04-23T15:00:00Z'
@@ -87,7 +108,7 @@ describe('AuthSessionService', () => {
     expect(service.isAuthenticated()).toBe(true);
     expect(service.session()).toEqual({
       baseUrl: 'http://localhost:8091',
-      username: 'demo.admin',
+      username: 'admin',
       token: 'token-seguro',
       roles: ['ROLE_ADMIN'],
       expiraEm: '2026-04-23T15:00:00Z'
@@ -99,7 +120,7 @@ describe('AuthSessionService', () => {
       'atlas.session',
       JSON.stringify({
         baseUrl: 'http://localhost:8091/',
-        username: 'demo.admin',
+        username: 'admin',
         token: 'token-seguro',
         roles: ['ROLE_ADMIN'],
         expiraEm: '2026-04-23T15:00:00Z'
@@ -125,7 +146,7 @@ describe('AuthSessionService', () => {
 
     service.save({
       baseUrl: 'http://localhost:8091',
-      username: 'demo.admin',
+      username: 'admin',
       token: 'token-seguro',
       roles: ['ROLE_ADMIN'],
       expiraEm: null

@@ -9,7 +9,7 @@ export function createPainelOperacionalApiMock() {
         mensagem: 'Sessao iniciada com sucesso',
         dados: {
           token: 'token-seguro',
-          username: 'demo.admin',
+          username: 'admin',
           roles: [],
           expiraEm: '2026-04-23T15:00:00Z'
         }
@@ -20,7 +20,7 @@ export function createPainelOperacionalApiMock() {
         sucesso: true,
         mensagem: 'Sessao carregada com sucesso',
         dados: {
-          username: 'demo.admin',
+          username: 'admin',
           roles: [],
           expiraEm: '2026-04-23T15:00:00Z'
         }
@@ -49,6 +49,39 @@ export function createPainelOperacionalApiMock() {
         }
       })
     ),
+    carregarDashboardMetrics: vi.fn().mockReturnValue(
+      of({
+        sucesso: true,
+        mensagem: 'Métricas do dashboard carregadas com sucesso',
+        dados: {
+          totalContratos: 1,
+          contratosAtivos: 1,
+          contratosInativos: 0,
+          totalServicos: 1,
+          servicosAtivos: 1,
+          servicosInativos: 0,
+          totalRelacionamentos: 1,
+          relacionamentosAtivos: 1,
+          repassesAtivos: 1,
+          softwaresAtivos: 1,
+          softwaresDesatualizados: 0,
+          percentualContratosComDocumentacao: 100,
+          percentualContratosComServicos: 100,
+          contratosPorGrupo: [{ nome: 'Operacoes Demo', total: 1 }],
+          servicosPorSetor: [{ nome: 'Suporte', total: 1 }],
+          ultimosContratos: [{ id: 1, nome: 'Contrato Atlas Labs Demo', grupo: 'Operacoes', ativo: true }],
+          ultimosRepasses: [
+            {
+              id: 1,
+              titulo: 'Repasse demo',
+              categoria: 'Informativo',
+              prioridade: 'Baixa',
+              criadoEm: '2026-05-21T12:00:00Z'
+            }
+          ]
+        }
+      })
+    ),
     listarContratos: vi.fn().mockReturnValue(
       of({
         sucesso: true,
@@ -56,9 +89,9 @@ export function createPainelOperacionalApiMock() {
         dados: [
           {
             id: 1,
-            nome: 'Contrato Aurora Demo',
+            nome: 'Contrato Atlas Labs Demo',
             grupo: 'Operacoes',
-            centralUrl: 'https://aurora-demo.example.invalid',
+            centralUrl: 'https://atlas-labs-demo.example.invalid',
             particularidades: 'Cenario ficticio para validacao visual.',
             documentacao: 'Playbook demo sem dados reais.',
             ativo: true
@@ -75,6 +108,8 @@ export function createPainelOperacionalApiMock() {
             id: 2,
             nome: 'Analytics Operacional',
             descricaoSoftware: 'Suite ATLAS Core',
+            versaoReferencia: '2026.3',
+            linkSoftware: 'https://analytics-atlas-labs.example.invalid',
             ativo: true
           }
         ]
@@ -88,7 +123,7 @@ export function createPainelOperacionalApiMock() {
           {
             id: 3,
             contratoId: 1,
-            contratoNome: 'Contrato Aurora Demo',
+            contratoNome: 'Contrato Atlas Labs Demo',
             servicoId: 2,
             servicoNome: 'Analytics Operacional',
             versao: '2026.3',
@@ -121,6 +156,12 @@ export function createPainelOperacionalApiMock() {
     atualizarServico: vi.fn(),
     ativarServico: vi.fn(),
     inativarServico: vi.fn(),
+    criarSoftware: vi.fn(),
+    atualizarSoftware: vi.fn(),
+    ativarSoftware: vi.fn(),
+    inativarSoftware: vi.fn(),
+    carregarSoftwares: vi.fn().mockReturnValue(of({ sucesso: true, mensagem: 'ok', dados: [] })),
+    baixarSoftware: vi.fn(),
     criarRelacionamento: vi.fn(),
     atualizarRelacionamento: vi.fn(),
     ativarRelacionamento: vi.fn(),

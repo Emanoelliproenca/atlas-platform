@@ -1,34 +1,34 @@
 <section class="software-shell">
   <header class="software-header">
     <div>
-      <p class="eyebrow">Modulo operacional</p>
-      <h1>Softwares</h1>
-      <p class="header-copy">Versoes, status e disponibilidade dos artefatos digitais.</p>
+      <p class="eyebrow">Catálogo técnico</p>
+      <h1>Sistemas e serviços digitais</h1>
+      <p class="header-copy">Versões, status e origem dos sistemas demonstrativos.</p>
     </div>
 
     <div class="header-actions">
-      <span class="header-badge">Central de versoes</span>
+      <span class="header-badge">Base operacional</span>
       @if (ehAdmin()) {
-        <button type="button" class="ghost-button" (click)="sincronizarVersoes()">Sincronizar versoes</button>
+        <button type="button" class="table-action" (click)="abrirNovoSoftware()">Novo software</button>
       }
     </div>
   </header>
 
   <section class="summary-grid">
     <article class="summary-card">
-      <span>Softwares mapeados</span>
-      <strong>{{ itens().length }}</strong>
+      <span>Sistemas mapeados</span>
+      <strong>{{ sistemasMapeados() }}</strong>
     </article>
     <article class="summary-card">
       <span>Atualizados</span>
       <strong>{{ atualizadosCount() }}</strong>
     </article>
     <article class="summary-card">
-      <span>Pendentes de revisao</span>
+      <span>Pendentes de revisão</span>
       <strong>{{ pendentesCount() }}</strong>
     </article>
     <article class="summary-card">
-      <span>Ultima sincronizacao</span>
+      <span>Dados carregados em</span>
       <strong>{{ ultimaSincronizacao() }}</strong>
     </article>
   </section>
@@ -40,26 +40,76 @@
     <article class="feedback-banner success">{{ mensagem() }}</article>
   }
 
+  @if (ehAdmin() && formularioAberto()) {
+    <section class="panel-card">
+      <div class="panel-head">
+        <div>
+          <h2>{{ softwareForm().id == null ? 'Novo software' : 'Editar software' }}</h2>
+          <p>Cadastre versão, link operacional, observação e situação usando dados persistidos no banco.</p>
+        </div>
+      </div>
+
+      <div class="consulta-grid">
+        <label class="field">
+          <span>Nome</span>
+          <input [ngModel]="softwareForm().nome" (ngModelChange)="atualizarCampo('nome', $event)" placeholder="Nome do software" />
+        </label>
+        <label class="field">
+          <span>Versão</span>
+          <input [ngModel]="softwareForm().versaoReferencia" (ngModelChange)="atualizarCampo('versaoReferencia', $event)" placeholder="Ex: 2026.4" />
+        </label>
+        <label class="field">
+          <span>Link</span>
+          <input [ngModel]="softwareForm().linkSoftware" (ngModelChange)="atualizarCampo('linkSoftware', $event)" placeholder="https://software.example.invalid" />
+        </label>
+        <label class="field">
+          <span>Situação</span>
+          <mat-form-field appearance="outline" class="atlas-select-field">
+            <mat-select [ngModel]="softwareForm().ativo" (ngModelChange)="atualizarCampo('ativo', $event)" panelClass="atlas-select-panel">
+              <mat-option [value]="true">Ativo</mat-option>
+              <mat-option [value]="false">Inativo</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </label>
+        <label class="field">
+          <span>Observação</span>
+          <textarea
+            rows="4"
+            [ngModel]="softwareForm().descricaoSoftware"
+            (ngModelChange)="atualizarCampo('descricaoSoftware', $event)"
+            placeholder="Descreva finalidade, contexto técnico ou observação operacional."
+          ></textarea>
+        </label>
+      </div>
+
+      <div class="row-actions">
+        <button type="button" class="table-action ghost" (click)="fecharFormulario()">Cancelar</button>
+        <button type="button" class="table-action" (click)="salvarSoftware()" [disabled]="salvando() || !formularioValido()">Salvar software</button>
+      </div>
+    </section>
+  }
+
   <section class="panel-card">
     <div class="panel-head">
       <div>
-        <h2>Consulta de versao</h2>
-        <p>Selecione um item para ver versao, origem e disponibilidade.</p>
+        <h2>Consulta de versão</h2>
+        <p>Consulte versão, origem e situação operacional.</p>
       </div>
     </div>
 
     @if (carregando()) {
-      <div class="empty-consulta">Carregando softwares...</div>
+      <div class="empty-consulta">Carregando sistemas...</div>
     } @else {
       <div class="consulta-grid">
         <label class="field">
-          <span>Software</span>
-          <select [ngModel]="softwareSelecionadoId()" (ngModelChange)="selecionarSoftware($event)">
-            <option [ngValue]="0">Selecione um software</option>
-            @for (item of itens(); track item.id) {
-              <option [ngValue]="item.id">{{ item.nome }}</option>
+          <mat-form-field appearance="outline" class="atlas-select-field">
+          <mat-select aria-label="Escolha um sistema" [ngModel]="softwareSelecionadoId()" (ngModelChange)="selecionarSoftware($event)" panelClass="atlas-select-panel">
+            <mat-option [value]="0">Escolha um sistema</mat-option>
+            @for (item of itensVisuais(); track item.id) {
+              <mat-option [value]="item.id">{{ item.nome }}</mat-option>
             }
-          </select>
+          </mat-select>
+          </mat-form-field>
         </label>
 
         @if (softwareSelecionado(); as software) {
@@ -67,51 +117,55 @@
             <div class="software-result-top">
               <div>
                 <h3>{{ software.nome }}</h3>
-                <p>{{ software.descricaoSoftware || 'Sem descricao operacional cadastrada.' }}</p>
+                <p>{{ software.descricaoSoftware || 'Sem descrição operacional cadastrada.' }}</p>
               </div>
-              <span class="status-badge" [class.pending]="software.status === 'Pendente'" [class.unavailable]="software.status === 'Indisponivel'">
+              <span class="status-badge" [class.pending]="software.status === 'Pendente'" [class.unavailable]="software.status === 'Indisponível'">
                 {{ software.status }}
               </span>
             </div>
 
             <dl class="software-details">
               <div>
-                <dt>Versao mais recente</dt>
+                <dt>Versão mais recente</dt>
                 <dd>{{ software.versaoReferencia || '-' }}</dd>
               </div>
               <div>
-                <dt>Status</dt>
+                <dt>Situação</dt>
                 <dd>{{ software.status }}</dd>
               </div>
               <div>
-                <dt>Ultima atualizacao</dt>
+                <dt>Atualizado em</dt>
                 <dd>{{ software.ultimaAtualizacao }}</dd>
               </div>
               <div>
                 <dt>Origem do arquivo</dt>
                 <dd>{{ software.origemArquivo }}</dd>
               </div>
+              <div>
+                <dt>Link</dt>
+                <dd>
+                  @if (software.linkSoftware) {
+                    <a [href]="software.linkSoftware" target="_blank" rel="noopener">Abrir</a>
+                  } @else {
+                    -
+                  }
+                </dd>
+              </div>
             </dl>
 
             <div class="software-observation">
-              <span>Observacao</span>
+              <span>Observação</span>
               <p>{{ software.observacao }}</p>
             </div>
 
-            <div class="result-actions">
-              <button
-                type="button"
-                class="primary-button"
-                [disabled]="!software.downloadDisponivel"
-                (click)="baixarSoftware(software)"
-              >
-                {{ software.downloadDisponivel ? 'Baixar versao mais recente' : 'Arquivo indisponivel' }}
-              </button>
-            </div>
+            @if (software.downloadDisponivel) {
+              <button type="button" class="table-action" (click)="baixarSoftware(software)">Baixar artefato</button>
+            }
+
           </article>
         } @else {
           <article class="empty-consulta empty-state-card">
-          Selecione um software para consultar status e download.
+            Selecione um sistema da base operacional para consultar os detalhes.
           </article>
         }
       </div>
@@ -121,40 +175,56 @@
   <section class="panel-card">
     <div class="panel-head">
       <div>
-        <h2>Lista de softwares</h2>
-        <p>Visao geral de versoes e disponibilidade.</p>
+        <h2>Inventário operacional</h2>
+        <p>Visão geral dos serviços digitais usados na base ATLAS.</p>
       </div>
     </div>
 
-    <div class="table-wrapper">
+    <div class="table-wrapper" tabindex="0" aria-label="Tabela do inventário operacional">
       <table>
         <thead>
           <tr>
-            <th>Software</th>
-            <th>Versao</th>
-            <th>Status</th>
-            <th>Ultima atualizacao</th>
-            <th>Acao</th>
+            <th>Sistema</th>
+            <th>Versão</th>
+            <th>Situação</th>
+            <th>Origem</th>
+            <th>Ação</th>
           </tr>
         </thead>
         <tbody>
-          @for (item of itens(); track item.id) {
+          @for (item of itensVisuais(); track item.id) {
             <tr>
-              <td>{{ item.nome }}</td>
+              <td class="truncate-cell" [title]="item.nome">{{ item.nome }}</td>
               <td>{{ item.versaoReferencia || '-' }}</td>
               <td>
-                <span class="status-badge" [class.pending]="item.status === 'Pendente'" [class.unavailable]="item.status === 'Indisponivel'">
+                <span class="status-badge" [class.pending]="item.status === 'Pendente'" [class.unavailable]="item.status === 'Indisponível'">
                   {{ item.status }}
                 </span>
               </td>
-              <td>{{ item.ultimaAtualizacao }}</td>
+              <td class="truncate-cell" [title]="item.origemArquivo">{{ item.origemArquivo }}</td>
               <td>
-                <button type="button" class="table-action" (click)="selecionarSoftware(item.id)">Visualizar</button>
+                <div class="row-actions">
+                  <button type="button" class="table-action" (click)="selecionarSoftware(item.id)">Visualizar</button>
+                  @if (ehAdmin()) {
+                    <button type="button" class="table-action ghost" (click)="editarSoftware(item)">Editar</button>
+                    <button type="button" class="table-action ghost" (click)="alternarSoftware(item)">
+                      {{ item.ativo ? 'Inativar' : 'Ativar' }}
+                    </button>
+                  }
+                  @if (item.downloadDisponivel) {
+                    <button type="button" class="table-action ghost" (click)="baixarSoftware(item)">Baixar</button>
+                  }
+                </div>
               </td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="5" class="empty-state">Nenhum software mapeado no momento.</td>
+              <td colspan="5" class="empty-state">
+                <strong>Nenhum sistema encontrado</strong>
+                @if (ehAdmin()) {
+                  <button type="button" class="table-action" (click)="abrirNovoSoftware()">Novo software</button>
+                }
+              </td>
             </tr>
           }
         </tbody>

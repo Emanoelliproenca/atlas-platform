@@ -19,7 +19,15 @@ const SESSION_STORAGE_KEY = 'atlas.session';
 export const DEFAULT_API_URL = environment.apiUrl;
 const LEGACY_API_URLS = new Set([
   'http://localhost:8080',
-  'http://127.0.0.1:8080'
+  'http://127.0.0.1:8080',
+  'http://localhost:4200',
+  'http://127.0.0.1:4200',
+  'http://localhost:4300',
+  'http://127.0.0.1:4300',
+  'http://localhost:4311',
+  'http://127.0.0.1:4311',
+  'http://localhost:4312',
+  'http://127.0.0.1:4312'
 ]);
 const DEFAULT_PREFERENCES: StoredConnectionPreferences = {
   baseUrl: DEFAULT_API_URL,

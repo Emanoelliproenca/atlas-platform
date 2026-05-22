@@ -16,6 +16,8 @@ export interface ServicoOption {
   id: number;
   nome: string;
   descricaoSoftware: string;
+  versaoReferencia?: string | null;
+  linkSoftware?: string | null;
   ativo: boolean;
 }
 
@@ -53,6 +55,46 @@ export interface PainelOperacional {
   linhas: PainelLinha[];
 }
 
+export interface DashboardDistribuicaoItem {
+  nome: string;
+  total: number;
+}
+
+export interface DashboardContratoRecente {
+  id: number;
+  nome: string;
+  grupo: string;
+  ativo: boolean;
+}
+
+export interface DashboardRepasseRecente {
+  id: number;
+  titulo: string;
+  categoria: string;
+  prioridade: string;
+  criadoEm: string | null;
+}
+
+export interface DashboardMetrics {
+  totalContratos: number;
+  contratosAtivos: number;
+  contratosInativos: number;
+  totalServicos: number;
+  servicosAtivos: number;
+  servicosInativos: number;
+  totalRelacionamentos: number;
+  relacionamentosAtivos: number;
+  repassesAtivos: number;
+  softwaresAtivos: number;
+  softwaresDesatualizados: number;
+  percentualContratosComDocumentacao: number;
+  percentualContratosComServicos: number;
+  contratosPorGrupo: DashboardDistribuicaoItem[];
+  servicosPorSetor: DashboardDistribuicaoItem[];
+  ultimosContratos: DashboardContratoRecente[];
+  ultimosRepasses: DashboardRepasseRecente[];
+}
+
 export interface PainelRequest {
   contratoIds: number[];
   servicoIds: number[];
@@ -76,6 +118,8 @@ export interface ServicoResponse {
   id: number;
   nome: string;
   descricaoSoftware: string;
+  versaoReferencia?: string | null;
+  linkSoftware?: string | null;
   ativo: boolean;
 }
 
@@ -135,6 +179,10 @@ export interface RepasseItem {
   conteudo: string;
   prioridade: string;
   ativo: boolean;
+  fixado: boolean;
+  autor: string | null;
+  anexoNome: string | null;
+  criadoEm: string | null;
 }
 
 export interface SoftwareResumo {
@@ -142,8 +190,11 @@ export interface SoftwareResumo {
   nome: string;
   descricaoSoftware: string;
   versaoReferencia: string;
+  linkSoftware?: string | null;
   totalContratos: number;
   ativo: boolean;
+  downloadDisponivel?: boolean;
+  artefatoNome?: string | null;
 }
 
 export interface ContratoServicoRequestPayload {
@@ -167,5 +218,17 @@ export interface ContratoRequestPayload {
 export interface ServicoRequestPayload {
   nome: string;
   descricaoSoftware: string;
+  versaoReferencia?: string;
+  linkSoftware?: string;
   ativo: boolean;
+}
+
+export interface RepasseRequestPayload {
+  titulo: string;
+  categoria: string;
+  conteudo: string;
+  prioridade: string;
+  ativo: boolean;
+  fixado: boolean;
+  anexoNome: string;
 }

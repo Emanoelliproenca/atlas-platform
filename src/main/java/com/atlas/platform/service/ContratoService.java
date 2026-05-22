@@ -26,17 +26,20 @@ public class ContratoService {
     private final ContratoServicoService contratoServicoService;
     private final ContratoArquivoService contratoArquivoService;
     private final ContratoMapper contratoMapper;
+    private final AuditoriaService auditoriaService;
 
     public ContratoService(
             ContratoRepository repository,
             ContratoServicoService contratoServicoService,
             ContratoArquivoService contratoArquivoService,
-            ContratoMapper contratoMapper
+            ContratoMapper contratoMapper,
+            AuditoriaService auditoriaService
     ) {
         this.repository = repository;
         this.contratoServicoService = contratoServicoService;
         this.contratoArquivoService = contratoArquivoService;
         this.contratoMapper = contratoMapper;
+        this.auditoriaService = auditoriaService;
     }
 
     @Transactional
@@ -45,7 +48,9 @@ public class ContratoService {
 
         Contrato contrato = new Contrato();
         contratoMapper.aplicarRequest(contrato, request);
-        return contratoMapper.toResponse(repository.save(contrato));
+        Contrato salvo = repository.save(contrato);
+        auditoriaService.registrar("CONTRATO", salvo.getId(), "CREATE_CONTRATO", "Contrato criado: " + salvo.getNome());
+        return contratoMapper.toResponse(salvo);
     }
 
     public List<ContratoResponse> listar(Boolean ativo, String grupo, String nome) {
@@ -77,14 +82,18 @@ public class ContratoService {
         Contrato contrato = buscarEntidadePorId(id);
         validarNomeDisponivel(request.getNome(), id);
         contratoMapper.aplicarRequest(contrato, request);
-        return contratoMapper.toResponse(repository.save(contrato));
+        Contrato salvo = repository.save(contrato);
+        auditoriaService.registrar("CONTRATO", salvo.getId(), "UPDATE_CONTRATO", "Contrato atualizado: " + salvo.getNome());
+        return contratoMapper.toResponse(salvo);
     }
 
     @Transactional
     public void deletar(Long id) {
         Contrato contrato = buscarEntidadePorId(id);
+        validarInativacaoPermitida(id);
         contrato.setAtivo(false);
-        repository.save(contrato);
+        Contrato salvo = repository.save(contrato);
+        auditoriaService.registrar("CONTRATO", salvo.getId(), "INACTIVATE_CONTRATO", "Contrato inativado: " + salvo.getNome());
     }
 
     @Transactional
@@ -140,8 +149,20 @@ public class ContratoService {
 
     private ContratoResponse alterarStatus(Long id, boolean ativo) {
         Contrato contrato = buscarEntidadePorId(id);
+        if (!ativo) {
+            validarInativacaoPermitida(id);
+        }
         contrato.setAtivo(ativo);
-        return contratoMapper.toResponse(repository.save(contrato));
+        Contrato salvo = repository.save(contrato);
+        auditoriaService.registrar("CONTRATO", salvo.getId(), ativo ? "ACTIVATE_CONTRATO" : "INACTIVATE_CONTRATO",
+                (ativo ? "Contrato ativado: " : "Contrato inativado: ") + salvo.getNome());
+        return contratoMapper.toResponse(salvo);
+    }
+
+    private void validarInativacaoPermitida(Long id) {
+        if (contratoServicoService.existeVinculoAtivoParaContrato(id)) {
+            throw new BusinessException("Não é possível inativar o contrato porque existem vínculos ativos com serviços.");
+        }
     }
 
     private record FiltrosContrato(Boolean ativo, String grupo, String nome) {

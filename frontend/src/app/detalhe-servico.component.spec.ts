@@ -56,12 +56,12 @@ describe('DetalheServicoComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Detalhe operacional do servico');
+    expect(compiled.textContent).toContain('Detalhe operacional do serviço');
     expect(compiled.textContent).toContain('Analytics Operacional');
     expect(compiled.textContent).toContain('Suite ATLAS Core');
     expect(compiled.textContent).toContain('Contrato Atlas');
     expect(compiled.textContent).toContain('2026.3');
-    expect(compiled.textContent).toContain('Este servico aparece em 1 contrato da base operacional.');
+    expect(compiled.textContent).toContain('Este serviço aparece em 1 contrato da base operacional.');
   });
 
   it('renders empty relationship summary when service has no linked contracts', async () => {
@@ -98,7 +98,7 @@ describe('DetalheServicoComponent', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain('Nenhum contrato vinculado por enquanto.');
-    expect(compiled.textContent).toContain('Este servico ainda nao esta vinculado a contratos. Assim que houver relacionamento, a matriz operacional aparece aqui.');
+    expect(compiled.textContent).toContain('Este serviço ainda não está vinculado a contratos. Assim que houver relacionamento, a matriz operacional aparece aqui.');
   });
 
   it('shows API error message when service detail fails to load', async () => {
@@ -113,7 +113,7 @@ describe('DetalheServicoComponent', () => {
             carregarServicoDetalhe: () =>
               throwError(() => ({
                 error: {
-                  mensagem: 'Servico nao encontrado'
+                mensagem: 'Serviço não encontrado'
                 }
               }))
           }
@@ -125,7 +125,7 @@ describe('DetalheServicoComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Servico nao encontrado');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Serviço não encontrado');
   });
 
   it('shows invalid service message when route id is missing', async () => {
@@ -150,7 +150,7 @@ describe('DetalheServicoComponent', () => {
     fixture.detectChanges();
 
     expect(carregarServicoDetalhe).not.toHaveBeenCalled();
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Servico invalido.');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Serviço inválido.');
   });
 
   it('shows fallback message when service detail fails without API message', async () => {
@@ -172,6 +172,6 @@ describe('DetalheServicoComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Nao foi possivel carregar o detalhe do servico.');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Não foi possível carregar o detalhe do serviço.');
   });
 });

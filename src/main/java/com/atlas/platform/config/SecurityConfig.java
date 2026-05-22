@@ -21,7 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableConfigurationProperties(SecurityProperties.class)
+@EnableConfigurationProperties({SecurityProperties.class, SoftwareSyncProperties.class})
 public class SecurityConfig {
 
     private static final String SESSION_EXPIRED_MESSAGE =
@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/logout").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/auditoria/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/**").hasAnyRole("ADMIN", "VISUALIZADOR")
                         .requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/**").hasRole("ADMIN")
@@ -53,9 +54,9 @@ public class SecurityConfig {
                 .addFilterBefore(bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) ->
-                                securityErrorResponseWriter.write(response, HttpStatus.UNAUTHORIZED, SESSION_EXPIRED_MESSAGE))
+                                securityErrorResponseWriter.write(request, response, HttpStatus.UNAUTHORIZED, SESSION_EXPIRED_MESSAGE))
                         .accessDeniedHandler((request, response, accessDeniedException) ->
-                                securityErrorResponseWriter.write(response, HttpStatus.FORBIDDEN, ACCESS_DENIED_MESSAGE))
+                                securityErrorResponseWriter.write(request, response, HttpStatus.FORBIDDEN, ACCESS_DENIED_MESSAGE))
                 );
 
         return http.build();

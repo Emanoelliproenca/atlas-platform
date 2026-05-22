@@ -1,18 +1,17 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { finalize } from 'rxjs';
 import { ApiFeedbackService } from './api-feedback.service';
 import { AuthSessionService } from './auth-session.service';
-import { PainelOperacionalApi, RepasseItem } from './painel-operacional-api';
+import { PainelOperacionalApi, RepasseItem, RepasseRequestPayload } from './painel-operacional-api';
 
-type RepasseCategoria = 'Todos' | 'Urgente' | 'Informativo' | 'Atualizacao' | 'Manutencao';
+type RepasseCategoria = 'Todos' | 'Urgente' | 'Informativo' | 'Atualização' | 'Manutenção';
 
-interface RepasseViewModel extends RepasseItem {
-  autor: string;
-  criadoEm: string | null;
-  fixado: boolean;
-  anexoNome: string | null;
+interface RepasseViewModel extends Omit<RepasseItem, 'autor'> {
+  autor: string | null;
   categoriaFiltro: Exclude<RepasseCategoria, 'Todos'>;
 }
 
@@ -26,21 +25,20 @@ interface RepasseFormModel {
   anexoNome: string;
 }
 
-const FILTROS: RepasseCategoria[] = ['Todos', 'Urgente', 'Informativo', 'Atualizacao', 'Manutencao'];
-
+const FILTROS: RepasseCategoria[] = ['Todos', 'Urgente', 'Informativo', 'Atualização', 'Manutenção'];
 const EMPTY_FORM: RepasseFormModel = {
   id: null,
   titulo: '',
   conteudo: '',
   categoria: 'Informativo',
-  prioridade: 'Media',
+  prioridade: 'Média',
   fixado: false,
   anexoNome: ''
 };
 
 @Component({
   selector: 'app-repasse',
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, DatePipe, MatFormFieldModule, MatSelectModule],
   templateUrl: './repasse.component.html',
   styleUrl: './repasse.component.scss'
 })
@@ -52,16 +50,18 @@ export class RepasseComponent {
   protected readonly itens = signal<RepasseViewModel[]>([]);
   protected readonly carregando = signal(true);
   protected readonly erro = signal('');
+  protected readonly mensagem = signal('');
   protected readonly ehAdmin = computed(() => this.authSession.session()?.roles.includes('ROLE_ADMIN') ?? false);
   protected readonly modalAberto = signal(false);
   protected readonly editandoId = signal<number | null>(null);
   protected readonly filtroAtual = signal<RepasseCategoria>('Todos');
   protected readonly formulario = signal<RepasseFormModel>({ ...EMPTY_FORM });
   protected readonly filtros = FILTROS;
+  protected readonly itensVisuais = computed(() => this.itens());
 
   protected readonly itensFiltrados = computed(() => {
     const filtro = this.filtroAtual();
-    const itens = this.itens();
+    const itens = this.itensVisuais();
 
     if (filtro === 'Todos') {
       return itens;
@@ -74,8 +74,16 @@ export class RepasseComponent {
   protected readonly listaRepasses = computed(() =>
     this.itensFiltrados().filter((item) => !this.repasseFixado() || item.id !== this.repasseFixado()!.id)
   );
+  protected readonly formularioValido = computed(() =>
+    Boolean(this.formulario().titulo.trim() && this.formulario().conteudo.trim())
+  );
 
   constructor() {
+    this.carregarRepasses();
+  }
+
+  private carregarRepasses(): void {
+    this.carregando.set(true);
     this.api.carregarRepasses()
       .pipe(finalize(() => this.carregando.set(false)))
       .subscribe({
@@ -83,7 +91,7 @@ export class RepasseComponent {
           this.itens.set(this.mapearItens(response.dados));
         },
         error: (error) => {
-          this.erro.set(this.apiFeedback.mensagem(error, 'Nao foi possivel carregar os repasses.'));
+          this.erro.set(this.apiFeedback.mensagem(error, 'Não foi possível carregar os repasses.'));
         }
       });
   }
@@ -93,12 +101,14 @@ export class RepasseComponent {
   }
 
   protected abrirNovoRepasse(): void {
+    this.limparFeedback();
     this.formulario.set({ ...EMPTY_FORM });
     this.editandoId.set(null);
     this.modalAberto.set(true);
   }
 
   protected editarRepasse(item: RepasseViewModel): void {
+    this.limparFeedback();
     this.formulario.set({
       id: item.id,
       titulo: item.titulo,
@@ -113,18 +123,29 @@ export class RepasseComponent {
   }
 
   protected excluirRepasse(itemId: number): void {
-    this.itens.set(this.itens().filter((item) => item.id !== itemId));
+    this.limparFeedback();
+    this.api.inativarRepasse(itemId).subscribe({
+      next: () => {
+        this.mensagem.set('Repasse inativado com sucesso.');
+        this.carregarRepasses();
+      },
+      error: (error) => {
+        this.erro.set(this.apiFeedback.mensagem(error, 'Não foi possível inativar o repasse.'));
+      }
+    });
   }
 
   protected alternarFixado(item: RepasseViewModel): void {
-    this.itens.update((itens) =>
-      this.ordenarRepasses(
-        itens.map((atual) => ({
-          ...atual,
-          fixado: atual.id === item.id ? !atual.fixado : false
-        }))
-      )
-    );
+    this.limparFeedback();
+    this.api.fixarRepasse(item.id).subscribe({
+      next: () => {
+        this.mensagem.set(item.fixado ? 'Repasse removido do destaque.' : 'Repasse fixado no topo.');
+        this.carregarRepasses();
+      },
+      error: (error) => {
+        this.erro.set(this.apiFeedback.mensagem(error, 'Não foi possível atualizar o destaque do repasse.'));
+      }
+    });
   }
 
   protected abrirAnexo(item: RepasseViewModel): void {
@@ -132,7 +153,8 @@ export class RepasseComponent {
       return;
     }
 
-    window.alert(`Anexo disponivel: ${item.anexoNome}`);
+    this.mensagem.set(`Anexo disponível para consulta: ${item.anexoNome}`);
+    this.erro.set('');
   }
 
   protected fecharModal(): void {
@@ -150,64 +172,28 @@ export class RepasseComponent {
 
   protected salvarRepasse(): void {
     const formulario = this.formulario();
-    if (!formulario.titulo.trim() || !formulario.conteudo.trim()) {
+    if (!this.formularioValido()) {
+      this.erro.set('Informe título e descrição para salvar o repasse.');
       return;
     }
 
-    const agora = new Date().toISOString();
-    const autor = this.authSession.session()?.username ?? 'ATLAS';
+    const editando = this.editandoId() != null;
+    const payload = this.criarPayloadRepasse(formulario);
+    const request = editando && formulario.id != null
+      ? this.api.atualizarRepasse(formulario.id, payload)
+      : this.api.criarRepasse(payload);
 
-    if (this.editandoId() != null) {
-      this.itens.update((itens) =>
-        this.ordenarRepasses(
-          itens.map((item) =>
-            item.id === this.editandoId()
-              ? {
-                  ...item,
-                  titulo: formulario.titulo.trim(),
-                  conteudo: formulario.conteudo.trim(),
-                  categoria: formulario.categoria,
-                  categoriaFiltro: formulario.categoria,
-                  prioridade: formulario.prioridade,
-                  fixado: formulario.fixado,
-                  anexoNome: formulario.anexoNome.trim() || null,
-                  autor,
-                  criadoEm: agora
-                }
-              : {
-                  ...item,
-                  fixado: formulario.fixado ? false : item.fixado
-                }
-          )
-        )
-      );
-    } else {
-      const novoRepasse: RepasseViewModel = {
-        id: this.proximoId(),
-        titulo: formulario.titulo.trim(),
-        conteudo: formulario.conteudo.trim(),
-        categoria: formulario.categoria,
-        categoriaFiltro: formulario.categoria,
-        prioridade: formulario.prioridade,
-        ativo: true,
-        autor,
-        criadoEm: agora,
-        fixado: formulario.fixado,
-        anexoNome: formulario.anexoNome.trim() || null
-      };
-
-      this.itens.update((itens) =>
-        this.ordenarRepasses([
-          ...itens.map((item) => ({
-            ...item,
-            fixado: formulario.fixado ? false : item.fixado
-          })),
-          novoRepasse
-        ])
-      );
-    }
-
-    this.fecharModal();
+    this.limparFeedback();
+    request.subscribe({
+      next: () => {
+        this.fecharModal();
+        this.mensagem.set(editando ? 'Repasse atualizado com sucesso.' : 'Repasse criado com sucesso.');
+        this.carregarRepasses();
+      },
+      error: (error) => {
+        this.erro.set(this.apiFeedback.mensagem(error, 'Não foi possível salvar o repasse.'));
+      }
+    });
   }
 
   protected trackById(_: number, item: RepasseViewModel): number {
@@ -224,15 +210,27 @@ export class RepasseComponent {
 
   private mapearItens(itens: RepasseItem[]): RepasseViewModel[] {
     return this.ordenarRepasses(
-      itens.map((item, index) => ({
+      itens.map((item) => ({
         ...item,
         categoriaFiltro: this.normalizarCategoria(item.categoria),
-        autor: 'ATLAS',
-        criadoEm: new Date(Date.now() - index * 60 * 60 * 1000).toISOString(),
-        fixado: index === 0,
-        anexoNome: index === 0 ? 'procedimento-atualizado.pdf' : null
+        autor: item.autor ?? 'ATLAS',
+        criadoEm: item.criadoEm ?? null,
+        anexoNome: item.anexoNome ?? null,
+        fixado: Boolean(item.fixado)
       }))
     );
+  }
+
+  private criarPayloadRepasse(formulario: RepasseFormModel): RepasseRequestPayload {
+    return {
+      titulo: formulario.titulo.trim(),
+      conteudo: formulario.conteudo.trim(),
+      categoria: formulario.categoria,
+      prioridade: formulario.prioridade,
+      ativo: true,
+      fixado: formulario.fixado,
+      anexoNome: formulario.anexoNome.trim()
+    };
   }
 
   private ordenarRepasses(itens: RepasseViewModel[]): RepasseViewModel[] {
@@ -257,17 +255,18 @@ export class RepasseComponent {
     }
 
     if (normalizada.includes('manut')) {
-      return 'Manutencao';
+      return 'Manutenção';
     }
 
     if (normalizada.includes('atual')) {
-      return 'Atualizacao';
+      return 'Atualização';
     }
 
     return 'Informativo';
   }
 
-  private proximoId(): number {
-    return this.itens().reduce((maiorId, item) => Math.max(maiorId, item.id), 0) + 1;
+  private limparFeedback(): void {
+    this.erro.set('');
+    this.mensagem.set('');
   }
 }

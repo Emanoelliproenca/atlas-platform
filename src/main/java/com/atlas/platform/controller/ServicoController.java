@@ -6,6 +6,7 @@ import com.atlas.platform.dto.ServicoResponse;
 import com.atlas.platform.response.ApiResponse;
 import com.atlas.platform.response.ApiResponses;
 import com.atlas.platform.service.ServicoService;
+import com.atlas.platform.util.PaginationUtils;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,11 +37,17 @@ public class ServicoController {
     }
 
     @GetMapping
-    public ApiResponse<List<ServicoResponse>> listar(
+    public ApiResponse<?> listar(
             @RequestParam(required = false) Boolean ativo,
-            @RequestParam(required = false) String nome
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size
     ) {
-        return ApiResponses.success("Lista de serviços", service.listar(ativo, nome));
+        List<ServicoResponse> servicos = service.listar(ativo, nome);
+        Object dados = PaginationUtils.requested(page, size)
+                ? PaginationUtils.page(servicos, page, size)
+                : servicos;
+        return ApiResponses.success("Lista de serviços", dados);
     }
 
     @GetMapping("/{id}")

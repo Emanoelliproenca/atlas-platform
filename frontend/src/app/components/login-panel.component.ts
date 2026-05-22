@@ -1,7 +1,6 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -11,7 +10,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   imports: [
     FormsModule,
     MatButtonModule,
-    MatCheckboxModule,
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule
@@ -35,12 +33,21 @@ export class LoginPanelComponent {
   readonly entrar = output<void>();
   readonly atualizar = output<void>();
   readonly sair = output<void>();
-  readonly usarApiPadrao = output<void>();
 
   protected readonly mostrarSenha = signal(false);
-  protected readonly lembrarAcesso = signal(true);
+  protected readonly formularioValido = computed(() =>
+    Boolean(this.username().trim() && this.password().trim())
+  );
 
   protected alternarSenha(): void {
     this.mostrarSenha.set(!this.mostrarSenha());
+  }
+
+  protected solicitarEntrada(): void {
+    if (!this.formularioValido() || this.carregando()) {
+      return;
+    }
+
+    this.entrar.emit();
   }
 }

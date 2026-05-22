@@ -27,9 +27,9 @@ describe('CadastrosComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Gestao de Relacionamentos');
+    expect(compiled.textContent).toContain('Gestão da base operacional');
     expect(compiled.textContent).toContain('Contratos cadastrados');
-    expect(compiled.textContent).toContain('Contrato Aurora Demo');
+    expect(compiled.textContent).toContain('Contrato Atlas Labs Demo');
     expect(api.listarContratos).toHaveBeenCalled();
   });
 
@@ -124,7 +124,7 @@ describe('CadastrosComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Voce nao tem permissao para acessar esta area.');
+    expect(compiled.textContent).toContain('Você não tem permissão para acessar esta área.');
     expect(api.listarContratos).not.toHaveBeenCalled();
   });
 });

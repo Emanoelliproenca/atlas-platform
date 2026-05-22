@@ -62,8 +62,10 @@ describe('DetalheContratoComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Contrato • Operacoes • Ativo');
-    expect(compiled.textContent).toContain('Servicos vinculados (1)');
+    expect(compiled.querySelector('.hero-copy p')?.textContent).toContain('Contrato');
+    expect(compiled.querySelector('.hero-copy p')?.textContent).toContain('Operacoes');
+    expect(compiled.querySelector('.hero-copy p')?.textContent).toContain('Ativo');
+    expect(compiled.textContent).toContain('Serviços vinculados (1)');
     expect(compiled.textContent).toContain('Contrato Atlas');
     expect(compiled.textContent).toContain('Operacoes');
     expect(compiled.textContent).toContain('Analytics Operacional');
@@ -141,7 +143,7 @@ describe('DetalheContratoComponent', () => {
       documentacao: 'Novo runbook',
       ativo: true
     });
-    expect(component.mensagemSucesso()).toBe('Documentacao atualizada com sucesso.');
+    expect(component.mensagemSucesso()).toBe('Documentação atualizada com sucesso.');
   });
 
   it('keeps save action disabled while there are no documentation changes', async () => {
@@ -183,8 +185,9 @@ describe('DetalheContratoComponent', () => {
 
     const host = fixture.nativeElement as HTMLElement;
     const saveButton = Array.from(host.querySelectorAll('button'))
-      .find((element) => element.textContent?.includes('Salvar documentacao')) as HTMLButtonElement;
+      .find((element) => element.textContent?.includes('Salvar alterações')) as HTMLButtonElement;
 
+    expect(saveButton).toBeTruthy();
     expect(saveButton.disabled).toBe(true);
   });
 
@@ -234,8 +237,9 @@ describe('DetalheContratoComponent', () => {
     fixture.detectChanges();
 
     const saveButton = Array.from(host.querySelectorAll('button'))
-      .find((element) => element.textContent?.includes('Salvar documentacao')) as HTMLButtonElement;
+      .find((element) => element.textContent?.includes('Salvar alterações')) as HTMLButtonElement;
 
+    expect(saveButton).toBeTruthy();
     expect(saveButton.disabled).toBe(false);
   });
 
@@ -260,7 +264,7 @@ describe('DetalheContratoComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Contrato invalido.');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Contrato inválido.');
   });
 
   it('shows API fallback message when contract detail fails without custom message', async () => {
@@ -284,6 +288,6 @@ describe('DetalheContratoComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Nao foi possivel carregar o detalhe do contrato.');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Não foi possível carregar o detalhe do contrato.');
   });
 });

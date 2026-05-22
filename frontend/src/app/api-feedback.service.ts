@@ -9,7 +9,7 @@ interface ApiErrorShape {
 }
 
 export const SESSION_EXPIRED_MESSAGE =
-  'Sessao expirada ou credenciais invalidas. Entre novamente para continuar.';
+  'Sessão expirada ou credenciais inválidas. Entre novamente para continuar.';
 
 @Injectable({ providedIn: 'root' })
 export class ApiFeedbackService {

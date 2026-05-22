@@ -5,6 +5,7 @@ import com.atlas.platform.model.ContratoServico;
 import com.atlas.platform.model.Servico;
 import com.atlas.platform.repository.ContratoServicoRepository;
 import com.atlas.platform.repository.ServicoRepository;
+import com.atlas.platform.repository.SoftwareArtefatoRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +22,16 @@ public class SoftwareConsultaService {
 
     private final ServicoRepository servicoRepository;
     private final ContratoServicoRepository contratoServicoRepository;
+    private final SoftwareArtefatoRepository softwareArtefatoRepository;
 
-    public SoftwareConsultaService(ServicoRepository servicoRepository, ContratoServicoRepository contratoServicoRepository) {
+    public SoftwareConsultaService(
+            ServicoRepository servicoRepository,
+            ContratoServicoRepository contratoServicoRepository,
+            SoftwareArtefatoRepository softwareArtefatoRepository
+    ) {
         this.servicoRepository = servicoRepository;
         this.contratoServicoRepository = contratoServicoRepository;
+        this.softwareArtefatoRepository = softwareArtefatoRepository;
     }
 
     public List<SoftwareResumoResponse> listar() {
@@ -53,13 +60,22 @@ public class SoftwareConsultaService {
                 servico.getId(),
                 servico.getNome(),
                 servico.getDescricaoSoftware(),
-                extrairVersaoReferencia(relacionamentos),
+                extrairVersaoReferencia(servico, relacionamentos),
+                servico.getLinkSoftware(),
                 relacionamentos.size(),
-                servico.getAtivo()
+                servico.getAtivo(),
+                softwareArtefatoRepository.existsByServicoIdAndAtivoTrue(servico.getId()),
+                softwareArtefatoRepository.findFirstByServicoIdAndAtivoTrueOrderByCriadoEmDesc(servico.getId())
+                        .map(artefato -> artefato.getNome())
+                        .orElse(null)
         );
     }
 
-    private String extrairVersaoReferencia(List<ContratoServico> relacionamentos) {
+    private String extrairVersaoReferencia(Servico servico, List<ContratoServico> relacionamentos) {
+        if (possuiTexto(servico.getVersaoReferencia())) {
+            return servico.getVersaoReferencia();
+        }
+
         return relacionamentos.stream()
                 .map(ContratoServico::getVersao)
                 .filter(this::possuiTexto)

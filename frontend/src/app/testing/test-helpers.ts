@@ -23,7 +23,7 @@ export function provideRouteId(id?: number | string): Provider {
   };
 }
 
-export function createSession(role: Role, username = role === 'ROLE_ADMIN' ? 'demo.admin' : 'demo.viewer') {
+export function createSession(role: Role, username = role === 'ROLE_ADMIN' ? 'admin' : 'viewer') {
   return {
     baseUrl: 'http://localhost:8091',
     username,

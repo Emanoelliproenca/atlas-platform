@@ -1,10 +1,7 @@
-<div class="brand-wordmark" aria-label="ATLAS">
-  <strong>ATLAS</strong>
-</div>
-
 <header class="panel-heading">
-  <h2 class="panel-title">Acesse sua conta</h2>
-  <p class="panel-subtitle">Demo corporativa com dados ficticios.</p>
+  <p class="panel-kicker">Acesso ATLAS</p>
+  <h2 class="panel-title">Entre na plataforma</h2>
+  <p class="panel-subtitle">Informe usuário e senha para acessar o painel operacional.</p>
 </header>
 
 <label class="field-hidden">
@@ -13,18 +10,27 @@
 
 <div class="form-stack">
   <mat-form-field appearance="outline" class="login-form-field">
+    <mat-label>Usuário</mat-label>
     <span matTextPrefix class="field-icon user-icon" aria-hidden="true"></span>
-    <input matInput [ngModel]="username()" (ngModelChange)="usernameChange.emit($event)" placeholder="Usuario" />
+    <input
+      matInput
+      autocomplete="username"
+      [ngModel]="username()"
+      (ngModelChange)="usernameChange.emit($event)"
+      aria-label="Usuário"
+    />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="login-form-field">
+    <mat-label>Senha</mat-label>
     <span matTextPrefix class="field-icon lock-icon" aria-hidden="true"></span>
     <input
       matInput
       [type]="mostrarSenha() ? 'text' : 'password'"
+      autocomplete="current-password"
       [ngModel]="password()"
       (ngModelChange)="passwordChange.emit($event)"
-      placeholder="Senha"
+      aria-label="Senha"
     />
     <button
       mat-icon-button
@@ -39,14 +45,13 @@
   </mat-form-field>
 </div>
 
-<div class="support-row">
-  <mat-checkbox class="remember-field" [checked]="lembrarAcesso()" (change)="lembrarAcesso.set(!lembrarAcesso())">
-    Lembrar acesso
-  </mat-checkbox>
-  <button type="button" class="text-link" (click)="usarApiPadrao.emit()">Usar API demo</button>
-</div>
-
-<button mat-flat-button type="button" class="primary-button" (click)="entrar.emit()" [disabled]="carregando()">
+<button
+  mat-flat-button
+  type="button"
+  class="primary-button"
+  (click)="solicitarEntrada()"
+  [disabled]="carregando() || !formularioValido()"
+>
   @if (carregando()) {
     <mat-spinner diameter="18"></mat-spinner>
   }

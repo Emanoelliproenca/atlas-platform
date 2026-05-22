@@ -32,7 +32,7 @@ export function criarMetricasRelacionamento(
       value: setores
     },
     {
-      label: 'Ultima versao vista',
+      label: 'Última versão vista',
       value: ultimaVersao,
       tone: 'warm' as const
     }
@@ -49,8 +49,8 @@ export function resumoQuantidadeRelacionamentos(
   }
 
   if (total === 1) {
-    return `Este servico aparece em 1 ${entidadeSingular} da base operacional.`;
+    return `Este serviço aparece em 1 ${entidadeSingular} da base operacional.`;
   }
 
-  return `Este servico aparece em ${total} ${entidadePlural} da base operacional.`;
+  return `Este serviço aparece em ${total} ${entidadePlural} da base operacional.`;
 }

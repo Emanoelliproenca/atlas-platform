@@ -12,6 +12,8 @@ public class ServicoMapper {
     public void aplicarRequest(Servico servico, ServicoRequest request) {
         servico.setNome(TextoUtils.normalizarObrigatorio(request.getNome()));
         servico.setDescricaoSoftware(TextoUtils.normalizarOpcional(request.getDescricaoSoftware()));
+        servico.setVersaoReferencia(TextoUtils.normalizarOpcional(request.getVersaoReferencia()));
+        servico.setLinkSoftware(TextoUtils.normalizarOpcional(request.getLinkSoftware()));
         servico.setAtivo(request.getAtivo());
     }
 
@@ -20,6 +22,8 @@ public class ServicoMapper {
                 servico.getId(),
                 servico.getNome(),
                 servico.getDescricaoSoftware(),
+                servico.getVersaoReferencia(),
+                servico.getLinkSoftware(),
                 servico.getAtivo()
         );
     }

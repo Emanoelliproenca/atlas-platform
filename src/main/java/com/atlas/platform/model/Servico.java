@@ -33,6 +33,10 @@ public class Servico {
 
     private String descricaoSoftware;
 
+    private String versaoReferencia;
+
+    private String linkSoftware;
+
     @Column(nullable = false)
     private Boolean ativo = true;
 

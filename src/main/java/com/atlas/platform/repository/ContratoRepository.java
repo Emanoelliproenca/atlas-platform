@@ -10,6 +10,8 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 
     boolean existsByNomeIgnoreCase(String nome);
 
+    long countByAtivoTrue();
+
     boolean existsByNomeIgnoreCaseAndIdNot(String nome, Long id);
 
     Optional<Contrato> findByNomeIgnoreCase(String nome);

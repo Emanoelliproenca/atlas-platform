@@ -16,6 +16,10 @@ public class ServicoRequest {
 
     private String descricaoSoftware;
 
+    private String versaoReferencia;
+
+    private String linkSoftware;
+
     @NotNull(message = "Ativo é obrigatório")
     private Boolean ativo;
 

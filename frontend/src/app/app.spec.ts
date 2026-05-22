@@ -24,7 +24,7 @@ describe('App', () => {
       'atlas.session',
       JSON.stringify({
         baseUrl: 'http://localhost:8091',
-        username: 'demo.admin',
+        username: 'admin',
         token: 'token-admin',
         roles: ['ROLE_ADMIN'],
         expiraEm: null
@@ -36,7 +36,14 @@ describe('App', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.home-copy h1')?.textContent).toContain('Bem-vinda ao ATLAS');
+    expect(compiled.querySelector('.home-overview h1')?.textContent).toContain('Dashboard ATLAS');
+    expect(compiled.textContent).toContain('Relacionamentos');
+    expect(compiled.textContent).toContain('Contratos ativos');
+    expect(compiled.textContent).toContain('100%');
+    expect(compiled.textContent).not.toContain('Entre para acessar a operação ATLAS');
+    expect(compiled.textContent).not.toContain('Abrir acesso');
+    expect(compiled.textContent).not.toContain('Cadastro da base');
+    expect(compiled.textContent).not.toContain('Gerenciar cadastros');
   });
 });
 

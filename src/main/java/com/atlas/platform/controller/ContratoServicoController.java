@@ -5,6 +5,7 @@ import com.atlas.platform.dto.ContratoServicoResponse;
 import com.atlas.platform.response.ApiResponse;
 import com.atlas.platform.response.ApiResponses;
 import com.atlas.platform.service.ContratoServicoService;
+import com.atlas.platform.util.PaginationUtils;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,17 +36,23 @@ public class ContratoServicoController {
     }
 
     @GetMapping
-    public ApiResponse<List<ContratoServicoResponse>> listar(
+    public ApiResponse<?> listar(
             @RequestParam(required = false) List<Long> contratoIds,
             @RequestParam(required = false) List<Long> servicoIds,
             @RequestParam(required = false) String grupo,
             @RequestParam(required = false) String setor,
             @RequestParam(required = false) String contratoNome,
-            @RequestParam(required = false) String servicoNome
+            @RequestParam(required = false) String servicoNome,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size
     ) {
+        List<ContratoServicoResponse> relacionamentos = service.listar(contratoIds, servicoIds, grupo, setor, contratoNome, servicoNome);
+        Object dados = PaginationUtils.requested(page, size)
+                ? PaginationUtils.page(relacionamentos, page, size)
+                : relacionamentos;
         return ApiResponses.success(
                 "Lista de relacionamentos",
-                service.listar(contratoIds, servicoIds, grupo, setor, contratoNome, servicoNome)
+                dados
         );
     }
 

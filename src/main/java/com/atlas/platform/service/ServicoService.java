@@ -25,15 +25,18 @@ public class ServicoService {
     private final ServicoRepository repository;
     private final ContratoServicoService contratoServicoService;
     private final ServicoMapper servicoMapper;
+    private final AuditoriaService auditoriaService;
 
     public ServicoService(
             ServicoRepository repository,
             ContratoServicoService contratoServicoService,
-            ServicoMapper servicoMapper
+            ServicoMapper servicoMapper,
+            AuditoriaService auditoriaService
     ) {
         this.repository = repository;
         this.contratoServicoService = contratoServicoService;
         this.servicoMapper = servicoMapper;
+        this.auditoriaService = auditoriaService;
     }
 
     @Transactional
@@ -42,7 +45,9 @@ public class ServicoService {
 
         Servico servico = new Servico();
         servicoMapper.aplicarRequest(servico, request);
-        return servicoMapper.toResponse(repository.save(servico));
+        Servico salvo = repository.save(servico);
+        auditoriaService.registrar("SERVICO", salvo.getId(), "CREATE_SERVICO", "Serviço criado: " + salvo.getNome());
+        return servicoMapper.toResponse(salvo);
     }
 
     public List<ServicoResponse> listar(Boolean ativo, String nome) {
@@ -73,14 +78,18 @@ public class ServicoService {
         Servico servico = buscarEntidadePorId(id);
         validarNomeDisponivel(request.getNome(), id);
         servicoMapper.aplicarRequest(servico, request);
-        return servicoMapper.toResponse(repository.save(servico));
+        Servico salvo = repository.save(servico);
+        auditoriaService.registrar("SERVICO", salvo.getId(), "UPDATE_SERVICO", "Serviço atualizado: " + salvo.getNome());
+        return servicoMapper.toResponse(salvo);
     }
 
     @Transactional
     public void deletar(Long id) {
         Servico servico = buscarEntidadePorId(id);
+        validarInativacaoPermitida(id);
         servico.setAtivo(false);
-        repository.save(servico);
+        Servico salvo = repository.save(servico);
+        auditoriaService.registrar("SERVICO", salvo.getId(), "INACTIVATE_SERVICO", "Serviço inativado: " + salvo.getNome());
     }
 
     @Transactional
@@ -124,8 +133,20 @@ public class ServicoService {
 
     private ServicoResponse alterarStatus(Long id, boolean ativo) {
         Servico servico = buscarEntidadePorId(id);
+        if (!ativo) {
+            validarInativacaoPermitida(id);
+        }
         servico.setAtivo(ativo);
-        return servicoMapper.toResponse(repository.save(servico));
+        Servico salvo = repository.save(servico);
+        auditoriaService.registrar("SERVICO", salvo.getId(), ativo ? "ACTIVATE_SERVICO" : "INACTIVATE_SERVICO",
+                (ativo ? "Serviço ativado: " : "Serviço inativado: ") + salvo.getNome());
+        return servicoMapper.toResponse(salvo);
+    }
+
+    private void validarInativacaoPermitida(Long id) {
+        if (contratoServicoService.existeVinculoAtivoParaServico(id)) {
+            throw new BusinessException("Não é possível inativar o serviço porque existem vínculos ativos com contratos.");
+        }
     }
 
     private record FiltrosServico(Boolean ativo, String nome) {

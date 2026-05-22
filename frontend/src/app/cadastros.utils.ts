@@ -83,10 +83,12 @@ export function relacionamentoDuplicado(
 }
 
 export function formatarUltimaAtualizacao(data: Date): string {
-  return new Intl.DateTimeFormat('pt-BR', {
+  const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
     dateStyle: 'short',
     timeStyle: 'short'
   }).format(data);
+
+  return `Atualizado em ${dataFormatada}`;
 }
 
 export function criarPayloadContrato(form: ContratoFormModel): ContratoRequestPayload {
@@ -104,6 +106,8 @@ export function criarPayloadServico(form: ServicoFormModel): ServicoRequestPaylo
   return {
     nome: form.nome.trim(),
     descricaoSoftware: form.descricaoSoftware.trim(),
+    versaoReferencia: form.versaoReferencia.trim(),
+    linkSoftware: form.linkSoftware.trim(),
     ativo: form.ativo
   };
 }

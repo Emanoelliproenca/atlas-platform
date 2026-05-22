@@ -6,6 +6,7 @@ import com.atlas.platform.dto.ContratoResponse;
 import com.atlas.platform.response.ApiResponse;
 import com.atlas.platform.response.ApiResponses;
 import com.atlas.platform.service.ContratoService;
+import com.atlas.platform.util.PaginationUtils;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +27,18 @@ public class ContratoController {
     }
 
     @GetMapping
-    public ApiResponse<List<ContratoResponse>> listar(
+    public ApiResponse<?> listar(
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(required = false) String grupo,
-            @RequestParam(required = false) String nome
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size
     ) {
-        return ApiResponses.success("Lista de contratos", service.listar(ativo, grupo, nome));
+        List<ContratoResponse> contratos = service.listar(ativo, grupo, nome);
+        Object dados = PaginationUtils.requested(page, size)
+                ? PaginationUtils.page(contratos, page, size)
+                : contratos;
+        return ApiResponses.success("Lista de contratos", dados);
     }
 
     @GetMapping("/{id}")

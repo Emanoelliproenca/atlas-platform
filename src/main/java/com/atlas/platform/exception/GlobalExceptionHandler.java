@@ -1,7 +1,8 @@
 package com.atlas.platform.exception;
 
-import com.atlas.platform.response.ApiResponse;
+import com.atlas.platform.response.ApiErrorResponse;
 import com.atlas.platform.response.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -15,12 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleNotFound(ResourceNotFoundException ex) {
-        return ApiResponses.errorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    public ResponseEntity<ApiErrorResponse> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+        return error(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         String mensagem = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -28,18 +29,19 @@ public class GlobalExceptionHandler {
                 .map(e -> e.getDefaultMessage())
                 .orElse("Erro de validação");
 
-        return ApiResponses.errorResponse(HttpStatus.BAD_REQUEST, mensagem);
+        return error(HttpStatus.BAD_REQUEST, mensagem, request);
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiResponse<Void>> handleBusiness(BusinessException ex) {
-        return ApiResponses.errorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    public ResponseEntity<ApiErrorResponse> handleBusiness(BusinessException ex, HttpServletRequest request) {
+        return error(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<ApiResponse<Void>> handleResponseStatus(ResponseStatusException ex) {
-        return ResponseEntity.status(ex.getStatusCode())
-                .body(ApiResponses.error(ex.getReason() == null ? "Erro na requisição" : ex.getReason()));
+    public ResponseEntity<ApiErrorResponse> handleResponseStatus(ResponseStatusException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        String mensagem = ex.getReason() == null ? "Erro na requisição" : ex.getReason();
+        return error(status, mensagem, request);
     }
 
     @ExceptionHandler({
@@ -47,12 +49,17 @@ public class GlobalExceptionHandler {
             MissingServletRequestParameterException.class,
             IllegalArgumentException.class
     })
-    public ResponseEntity<ApiResponse<Void>> handleBadRequest(Exception ex) {
-        return ApiResponses.errorResponse(HttpStatus.BAD_REQUEST, "Requisição inválida");
+    public ResponseEntity<ApiErrorResponse> handleBadRequest(Exception ex, HttpServletRequest request) {
+        return error(HttpStatus.BAD_REQUEST, "Requisição inválida", request);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleGeneric(Exception ex) {
-        return ApiResponses.errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno no servidor");
+    public ResponseEntity<ApiErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno no servidor", request);
+    }
+
+    private ResponseEntity<ApiErrorResponse> error(HttpStatus status, String message, HttpServletRequest request) {
+        return ResponseEntity.status(status)
+                .body(ApiResponses.structuredError(status, message, request.getRequestURI()));
     }
 }

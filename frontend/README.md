@@ -23,8 +23,8 @@ export APP_SECURITY_VIEWER_PASSWORD=escolha-uma-senha-demo-viewer
 
 Credenciais demo:
 
-- Admin: `demo.admin` / valor de `APP_SECURITY_ADMIN_PASSWORD`
-- Visualizador: `demo.viewer` / valor de `APP_SECURITY_VIEWER_PASSWORD`
+- Admin: `admin` / valor de `APP_SECURITY_ADMIN_PASSWORD`
+- Visualizador: `viewer` / valor de `APP_SECURITY_VIEWER_PASSWORD`
 
 ## Testes
 

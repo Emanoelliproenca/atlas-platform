@@ -4,31 +4,61 @@
   } @else if (erro()) {
     <div class="info-card error-card">{{ erro() }}</div>
   } @else if (detalhe(); as dados) {
-    <header class="contract-top">
-      <div>
-        <h1>{{ dados.contrato.nome }}</h1>
-        <p>
-          Contrato
-          <span aria-hidden="true">•</span>
-          {{ dados.contrato.grupo || '-' }}
-          <span aria-hidden="true">•</span>
-          {{ dados.contrato.ativo ? 'Ativo' : 'Inativo' }}
-        </p>
-      </div>
-      <a routerLink="/relacionamentos" class="back-link">Voltar</a>
-    </header>
+    <header class="contract-hero">
+      <a routerLink="/relacionamentos" class="hero-back">‹ Voltar</a>
 
-    <p class="metrics-line">
-      <strong>{{ dados.servicos.length }}</strong> servicos
-      <span aria-hidden="true">•</span>
-      <strong>{{ totalSetores(dados) }}</strong> setor{{ totalSetores(dados) === 1 ? '' : 'es' }}
-      <span aria-hidden="true">•</span>
-      {{ ultimaVersao(dados) }}
-    </p>
+      <div class="hero-main">
+        <div class="contract-avatar" aria-hidden="true">{{ dados.contrato.nome.slice(0, 2).toUpperCase() }}</div>
+        <div class="hero-copy">
+          <h1>{{ dados.contrato.nome }}</h1>
+          <p>
+            <span>Contrato</span>
+            <span aria-hidden="true">•</span>
+            <span>{{ dados.contrato.grupo || '-' }}</span>
+            <span aria-hidden="true">•</span>
+            <strong [class.inactive]="!dados.contrato.ativo">{{ dados.contrato.ativo ? 'Ativo' : 'Inativo' }}</strong>
+          </p>
+        </div>
+
+        <a routerLink="/relacionamentos" class="hero-action">‹ Voltar para relacionamentos</a>
+      </div>
+
+      <div class="hero-metrics" aria-label="Indicadores do contrato">
+        <article>
+          <span class="metric-icon">▣</span>
+          <div>
+            <strong>{{ dados.servicos.length }}</strong>
+            <small>Serviços vinculados</small>
+          </div>
+        </article>
+        <article>
+          <span class="metric-icon">◇</span>
+          <div>
+            <strong>{{ totalSetores(dados) }}</strong>
+            <small>Setores</small>
+          </div>
+        </article>
+        <article>
+          <span class="metric-icon">⌁</span>
+          <div>
+            <strong>{{ ultimaVersao(dados) }}</strong>
+            <small>Versão atual</small>
+          </div>
+        </article>
+        <article>
+          <span class="metric-icon">✓</span>
+          <div>
+            <strong>{{ dados.contrato.ativo ? 'Ativo' : 'Inativo' }}</strong>
+            <small>Situação do contrato</small>
+          </div>
+        </article>
+      </div>
+    </header>
 
     <div class="detail-grid">
       <section class="contract-info">
-        <h2>Contrato</h2>
+        <h2><span></span>Informações do contrato</h2>
+
         <dl>
           <div>
             <dt>Contrato</dt>
@@ -39,8 +69,8 @@
             <dd>{{ dados.contrato.grupo || '-' }}</dd>
           </div>
           <div>
-            <dt>Status</dt>
-            <dd>{{ dados.contrato.ativo ? 'Ativo' : 'Inativo' }}</dd>
+            <dt>Situação</dt>
+            <dd><span class="status-chip" [class.inactive]="!dados.contrato.ativo">{{ dados.contrato.ativo ? 'Ativo' : 'Inativo' }}</span></dd>
           </div>
           <div>
             <dt>Central</dt>
@@ -48,115 +78,134 @@
               @if (dados.contrato.centralUrl) {
                 <a [href]="dados.contrato.centralUrl" target="_blank" rel="noopener" class="external-link" [title]="dados.contrato.centralUrl">Acessar</a>
               } @else {
-                -
+                <span class="muted-value">Não informada</span>
               }
             </dd>
           </div>
         </dl>
+
+        <p class="updated-at">▦ Atualizado em {{ ultimaAtualizacao() }}</p>
       </section>
 
-      <section class="documentation-panel">
-        <div class="doc-block">
-          @if (ehAdmin()) {
-            <label class="form-field">
-              <span>Particularidades</span>
-              <textarea
-                [ngModel]="particularidades()"
-                (ngModelChange)="particularidades.set($event)"
-                rows="4"
-                placeholder="Nenhuma particularidade registrada."
-              ></textarea>
-            </label>
-          } @else {
-            <h4>Particularidades</h4>
-            <p>{{ dados.contrato.particularidades || 'Nenhuma particularidade registrada ate o momento.' }}</p>
-          }
+      <section class="operations-card">
+        <div class="operations-tabs" aria-label="Seções operacionais">
+          <span class="active">▤ Documentação</span>
+          <span>☷ Particularidades</span>
         </div>
 
-        <div class="doc-block">
+        <div class="operations-content">
+          <div class="doc-block">
+            @if (ehAdmin()) {
+              <label class="form-field">
+                <span>Documentação operacional</span>
+                <textarea
+                  [ngModel]="documentacao()"
+                  (ngModelChange)="documentacao.set($event)"
+                  rows="4"
+                  placeholder="Nenhuma documentação operacional registrada."
+                ></textarea>
+              </label>
+              <small>Atualizado em {{ ultimaAtualizacao() }}</small>
+            } @else {
+              <h4>Documentação operacional</h4>
+              <p>{{ dados.contrato.documentacao || 'Nenhuma documentação operacional registrada até o momento.' }}</p>
+              <small>Atualizado em {{ ultimaAtualizacao() }}</small>
+            }
+          </div>
+
+          <div class="doc-block">
+            @if (ehAdmin()) {
+              <label class="form-field">
+                <span>Particularidades</span>
+                <textarea
+                  [ngModel]="particularidades()"
+                  (ngModelChange)="particularidades.set($event)"
+                  rows="4"
+                  placeholder="Nenhuma particularidade registrada."
+                ></textarea>
+              </label>
+              <small>Atualizado em {{ ultimaAtualizacao() }}</small>
+            } @else {
+              <h4>Particularidades</h4>
+              <p>{{ dados.contrato.particularidades || 'Nenhuma particularidade registrada até o momento.' }}</p>
+              <small>Atualizado em {{ ultimaAtualizacao() }}</small>
+            }
+          </div>
+
+          <div class="doc-block files-block">
+            <div class="files-head">
+              <h4>Arquivos do contrato</h4>
+              @if (ehAdmin()) {
+                <label class="upload-button" [class.disabled]="enviandoArquivo()">
+                  {{ enviandoArquivo() ? 'Enviando...' : '+ Adicionar arquivo' }}
+                  <input type="file" accept="application/pdf,*/*" [disabled]="enviandoArquivo()" (change)="adicionarArquivo($event)" />
+                </label>
+              }
+            </div>
+
+            <div class="files-list">
+              @for (arquivo of dados.arquivos ?? []; track arquivo.id) {
+                <article class="file-item">
+                  <span class="file-icon">PDF</span>
+                  <div class="file-copy">
+                    <strong [title]="arquivo.nome">{{ arquivo.nome }}</strong>
+                    <small>{{ tamanhoArquivo(arquivo.tamanho) }}</small>
+                  </div>
+                  <div class="file-actions">
+                    <button type="button" class="file-action" (click)="abrirArquivo(arquivo)">Abrir</button>
+                    <button type="button" class="file-action" (click)="baixarArquivo(arquivo)">Baixar</button>
+                  </div>
+                </article>
+              } @empty {
+                <p class="empty-files">▧ Nenhum arquivo vinculado.</p>
+              }
+            </div>
+
+            @if (erroArquivo()) {
+              <p class="file-error">{{ erroArquivo() }}</p>
+            }
+          </div>
+
           @if (ehAdmin()) {
-            <label class="form-field">
-              <span>Documentacao operacional</span>
-              <textarea
-                [ngModel]="documentacao()"
-                (ngModelChange)="documentacao.set($event)"
-                rows="5"
-                placeholder="Nenhuma documentacao operacional registrada."
-              ></textarea>
-            </label>
             <div class="doc-actions">
               <button type="button" class="primary-button" (click)="salvarDocumentacao()" [disabled]="salvando() || !podeSalvarDocumentacao()">
-                {{ salvando() ? 'Salvando...' : 'Salvar documentacao' }}
+                {{ salvando() ? 'Salvando...' : 'Salvar alterações' }}
               </button>
             </div>
-          } @else {
-            <h4>Documentacao operacional</h4>
-            <p>{{ dados.contrato.documentacao || 'Nenhuma documentacao operacional registrada ate o momento.' }}</p>
+          }
+
+          @if (mensagemSucesso()) {
+            <p class="success-banner">{{ mensagemSucesso() }}</p>
           }
         </div>
-
-        <div class="doc-block files-block">
-          <div class="files-head">
-            <h4>Arquivos do contrato</h4>
-            @if (ehAdmin()) {
-              <label class="upload-button" [class.disabled]="enviandoArquivo()">
-                {{ enviandoArquivo() ? 'Enviando...' : '+ Adicionar arquivo' }}
-                <input type="file" accept="application/pdf,*/*" [disabled]="enviandoArquivo()" (change)="adicionarArquivo($event)" />
-              </label>
-            }
-          </div>
-
-          <div class="files-list">
-            @for (arquivo of dados.arquivos ?? []; track arquivo.id) {
-              <article class="file-item">
-                <span class="file-icon">PDF</span>
-                <div class="file-copy">
-                  <strong [title]="arquivo.nome">{{ arquivo.nome }}</strong>
-                  <small>{{ tamanhoArquivo(arquivo.tamanho) }}</small>
-                </div>
-                <div class="file-actions">
-                  <button type="button" class="file-action" (click)="abrirArquivo(arquivo)">Abrir</button>
-                  <button type="button" class="file-action" (click)="baixarArquivo(arquivo)">Baixar</button>
-                </div>
-              </article>
-            } @empty {
-              <p class="empty-files">Nenhum arquivo vinculado.</p>
-            }
-          </div>
-
-          @if (erroArquivo()) {
-            <p class="file-error">{{ erroArquivo() }}</p>
-          }
-        </div>
-
-        @if (mensagemSucesso()) {
-          <p class="success-banner">{{ mensagemSucesso() }}</p>
-        }
       </section>
     </div>
 
-    <article class="table-card">
+    <article class="services-card">
       <div class="section-header">
-        <div>
-          <h2>Servicos vinculados ({{ dados.servicos.length }})</h2>
-        </div>
+        <h2>Serviços vinculados ({{ dados.servicos.length }})</h2>
       </div>
 
       <div class="table-wrapper">
         <table>
           <thead>
             <tr>
-              <th>Servico</th>
-              <th>Versao</th>
+              <th>Serviço</th>
+              <th>Versão</th>
               <th>Setor</th>
-              <th>Observacao</th>
-              <th>Acao</th>
+              <th>Observação</th>
+              <th>Ação</th>
             </tr>
           </thead>
           <tbody>
             @for (item of dados.servicos; track item.id) {
               <tr>
-                <td>{{ item.servicoNome }}</td>
+                <td>
+                  <div class="service-name">
+                    <span aria-hidden="true">▥</span>
+                    <strong>{{ item.servicoNome }}</strong>
+                  </div>
+                </td>
                 <td>{{ item.versao || '-' }}</td>
                 <td>{{ item.setor || '-' }}</td>
                 <td>{{ item.observacao || '-' }}</td>
@@ -164,7 +213,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="empty-state">Nenhum servico vinculado.</td>
+                <td colspan="5" class="empty-state">Nenhum serviço vinculado.</td>
               </tr>
             }
           </tbody>

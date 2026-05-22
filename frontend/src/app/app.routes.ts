@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminGuard } from './admin.guard';
+import { authGuard, loginRedirectGuard } from './auth.guard';
 import { CadastrosComponent } from './cadastros.component';
 import { DetalheContratoComponent } from './detalhe-contrato.component';
 import { DetalheServicoComponent } from './detalhe-servico.component';
@@ -12,11 +13,13 @@ import { SoftwaresComponent } from './softwares.component';
 export const routes: Routes = [
   {
     path: '',
-    component: HomeRouteComponent
+    component: HomeRouteComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'login',
-    component: LoginRouteComponent
+    component: LoginRouteComponent,
+    canActivate: [loginRedirectGuard]
   },
   {
     path: 'contratos',
@@ -25,28 +28,33 @@ export const routes: Routes = [
   },
   {
     path: 'relacionamentos',
-    component: RelacionamentosComponent
+    component: RelacionamentosComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'cadastros',
     component: CadastrosComponent,
-    canActivate: [adminGuard]
+    canActivate: [authGuard, adminGuard]
   },
   {
     path: 'repasse',
-    component: RepasseComponent
+    component: RepasseComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'softwares',
-    component: SoftwaresComponent
+    component: SoftwaresComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'contratos/:id',
-    component: DetalheContratoComponent
+    component: DetalheContratoComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'servicos/:id',
-    component: DetalheServicoComponent
+    component: DetalheServicoComponent,
+    canActivate: [authGuard]
   },
   {
     path: '**',

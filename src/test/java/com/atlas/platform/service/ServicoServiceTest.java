@@ -33,6 +33,9 @@ class ServicoServiceTest {
     @Spy
     private ServicoMapper servicoMapper;
 
+    @Mock
+    private AuditoriaService auditoriaService;
+
     @InjectMocks
     private ServicoService service;
 

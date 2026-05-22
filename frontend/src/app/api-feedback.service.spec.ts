@@ -23,7 +23,7 @@ describe('ApiFeedbackService', () => {
     const mensagem = service.mensagem({ status: 401 }, 'fallback');
 
     expect(clear).toHaveBeenCalled();
-    expect(mensagem).toBe('Sessao expirada ou credenciais invalidas. Entre novamente para continuar.');
+    expect(mensagem).toBe('Sessão expirada ou credenciais inválidas. Entre novamente para continuar.');
   });
 
   it('returns API message when available', () => {

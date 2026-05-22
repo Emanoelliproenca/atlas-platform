@@ -10,6 +10,8 @@ public interface ServicoRepository extends JpaRepository<Servico, Long> {
 
     boolean existsByNomeIgnoreCase(String nome);
 
+    long countByAtivoTrue();
+
     boolean existsByNomeIgnoreCaseAndIdNot(String nome, Long id);
 
     Optional<Servico> findByNomeIgnoreCase(String nome);

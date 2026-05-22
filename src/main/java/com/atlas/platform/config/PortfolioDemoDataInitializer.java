@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile("demo")
+@Profile({"demo", "seed"})
 public class PortfolioDemoDataInitializer {
 
     @Bean
@@ -22,91 +22,97 @@ public class PortfolioDemoDataInitializer {
             ContratoServicoRepository contratoServicoRepository
     ) {
         return args -> {
-            if (contratoRepository.count() > 0 || servicoRepository.count() > 0) {
-                return;
-            }
-
-            Contrato aurora = contratoRepository.save(criarContrato(
-                    "Aurora Retail Cloud",
+            Contrato aurora = obterOuCriarContrato(contratoRepository,
+                    "Atlas Labs Retail",
                     "Varejo",
-                    "https://aurora-demo.example.invalid",
-                    "Organizacao ficticia em fase de expansao, com prioridade para dashboards executivos e trilhas de atendimento.",
-                    "Documentacao centralizada no playbook de implantacao SaaS."
-            ));
-            Contrato vector = contratoRepository.save(criarContrato(
-                    "Vector Finance Ops",
-                    "Financas",
-                    "https://vector-demo.example.invalid",
-                    "Operacao regulada com janelas restritas para publicacao de novas versoes.",
-                    "Runbook de suporte nivel 2 e matriz de escalonamento disponiveis no ATLAS."
-            ));
-            Contrato lumen = contratoRepository.save(criarContrato(
-                    "Lumen Health Services",
-                    "Saude",
-                    "https://lumen-demo.example.invalid",
-                    "Ambiente com integracoes criticas e acompanhamento semanal pelo time de operacoes corporativas.",
-                    "Checklists de implantacao, homologacao e rollback mantidos por contrato."
-            ));
+                    "https://atlas-labs-retail.example.invalid",
+                    "Operação fictícia de varejo com múltiplas unidades.",
+                    "Documentação operacional demonstrativa para consulta do time."
+            );
+            Contrato lumen = obterOuCriarContrato(contratoRepository,
+                    "Atlas Labs Health",
+                    "Saúde",
+                    "https://atlas-labs-health.example.invalid",
+                    "Ambiente fictício para suporte de serviços digitais de saúde.",
+                    "Fluxos simulados de atendimento, atualização e acompanhamento."
+            );
+            Contrato vector = obterOuCriarContrato(contratoRepository,
+                    "Atlas Labs Finance",
+                    "Finanças",
+                    "https://atlas-labs-finance.example.invalid",
+                    "Operação fictícia de controle financeiro e processos internos.",
+                    "Procedimentos simulados para auditoria e acompanhamento operacional."
+            );
 
-            Servico analytics = servicoRepository.save(criarServico(
+            Servico analytics = obterOuCriarServico(servicoRepository,
                     "Analytics Operacional",
-                    "Dashboards de indicadores, consolidacao de eventos e metricas de uso para organizacoes B2B."
-            ));
-            Servico workflow = servicoRepository.save(criarServico(
-                    "Workflow Automation",
-                    "Automacao de rotinas operacionais, aprovacoes e repasses entre times de operacao."
-            ));
-            Servico portal = servicoRepository.save(criarServico(
-                    "Service Portal",
-                    "Portal de atendimento, documentacao e acompanhamento de solicitacoes corporativas."
-            ));
-            Servico integra = servicoRepository.save(criarServico(
+                    "Serviço fictício para leitura de indicadores operacionais."
+            );
+            Servico integra = obterOuCriarServico(servicoRepository,
                     "Integration Gateway",
-                    "Camada de integracao com ERPs, CRMs e plataformas externas."
-            ));
+                    "Serviço fictício para integração entre sistemas internos e externos."
+            );
+            Servico workflow = obterOuCriarServico(servicoRepository,
+                    "Workflow Automation",
+                    "Serviço fictício para automação de rotinas operacionais."
+            );
+            Servico portal = obterOuCriarServico(servicoRepository,
+                    "Service Portal",
+                    "Serviço fictício para centralização de solicitações e acompanhamento."
+            );
 
-            contratoServicoRepository.save(criarRelacionamento(aurora, analytics, "2026.2", "Operacoes Corporativas", "Painel executivo liberado para liderancas regionais."));
-            contratoServicoRepository.save(criarRelacionamento(aurora, workflow, "2026.1", "Implantacao", "Automacoes de onboarding em validacao assistida."));
-            contratoServicoRepository.save(criarRelacionamento(vector, analytics, "2026.3", "Operacoes", "Indicadores financeiros revisados mensalmente."));
-            contratoServicoRepository.save(criarRelacionamento(vector, integra, "2026.2", "Integracoes", "Integracao com ERP em janela controlada."));
-            contratoServicoRepository.save(criarRelacionamento(lumen, portal, "2026.1", "Suporte", "Base de conhecimento e solicitacoes ativas."));
-            contratoServicoRepository.save(criarRelacionamento(lumen, integra, "2026.2", "Integracoes", "Sincronizacao de dados operacionais com auditoria."));
+            obterOuCriarRelacionamento(contratoServicoRepository, aurora, analytics, "2026.2", "Operações Corporativas", "Utilizado para acompanhamento de indicadores simulados.");
+            obterOuCriarRelacionamento(contratoServicoRepository, aurora, workflow, "2026.1", "Implantação", "Automatiza fluxos internos fictícios de atendimento.");
+            obterOuCriarRelacionamento(contratoServicoRepository, lumen, integra, "2026.2", "Integrações", "Integra sistemas demonstrativos de atendimento.");
+            obterOuCriarRelacionamento(contratoServicoRepository, lumen, portal, "2026.1", "Suporte", "Portal fictício para abertura e acompanhamento de demandas.");
+            obterOuCriarRelacionamento(contratoServicoRepository, vector, analytics, "2026.3", "Operações", "Apoia leitura de métricas financeiras simuladas.");
+            obterOuCriarRelacionamento(contratoServicoRepository, vector, integra, "2026.2", "Integrações", "Mantém comunicação fictícia entre módulos financeiros.");
         };
     }
 
-    private Contrato criarContrato(String nome, String grupo, String centralUrl, String particularidades, String documentacao) {
-        Contrato contrato = new Contrato();
+    private Contrato obterOuCriarContrato(
+            ContratoRepository contratoRepository,
+            String nome,
+            String grupo,
+            String centralUrl,
+            String particularidades,
+            String documentacao
+    ) {
+        Contrato contrato = contratoRepository.findByNomeIgnoreCase(nome).orElseGet(Contrato::new);
         contrato.setNome(nome);
         contrato.setGrupo(grupo);
         contrato.setCentralUrl(centralUrl);
         contrato.setParticularidades(particularidades);
         contrato.setDocumentacao(documentacao);
         contrato.setAtivo(true);
-        return contrato;
+        return contratoRepository.save(contrato);
     }
 
-    private Servico criarServico(String nome, String descricaoSoftware) {
-        Servico servico = new Servico();
+    private Servico obterOuCriarServico(ServicoRepository servicoRepository, String nome, String descricaoSoftware) {
+        Servico servico = servicoRepository.findByNomeIgnoreCase(nome).orElseGet(Servico::new);
         servico.setNome(nome);
         servico.setDescricaoSoftware(descricaoSoftware);
         servico.setAtivo(true);
-        return servico;
+        return servicoRepository.save(servico);
     }
 
-    private ContratoServico criarRelacionamento(
+    private ContratoServico obterOuCriarRelacionamento(
+            ContratoServicoRepository contratoServicoRepository,
             Contrato contrato,
             Servico servico,
             String versao,
             String setor,
             String observacao
     ) {
-        ContratoServico relacionamento = new ContratoServico();
+        ContratoServico relacionamento = contratoServicoRepository
+                .findByContratoIdAndServicoId(contrato.getId(), servico.getId())
+                .orElseGet(ContratoServico::new);
         relacionamento.setContrato(contrato);
         relacionamento.setServico(servico);
         relacionamento.setVersao(versao);
         relacionamento.setSetor(setor);
         relacionamento.setObservacao(observacao);
         relacionamento.setAtivo(true);
-        return relacionamento;
+        return contratoServicoRepository.save(relacionamento);
     }
 }

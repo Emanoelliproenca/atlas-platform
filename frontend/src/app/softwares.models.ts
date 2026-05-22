@@ -1,6 +1,6 @@
 import { SoftwareResumo } from './painel-operacional.models';
 
-export type StatusSoftware = 'Disponivel' | 'Pendente' | 'Indisponivel';
+export type StatusSoftware = 'Disponível' | 'Pendente' | 'Indisponível';
 
 export interface SoftwareViewModel extends SoftwareResumo {
   status: StatusSoftware;
@@ -16,19 +16,20 @@ export function mapearSoftwareViewModel(
 ): SoftwareViewModel {
   const possuiVersao = Boolean(item.versaoReferencia?.trim());
   const status: StatusSoftware = item.ativo
-    ? (possuiVersao ? 'Disponivel' : 'Pendente')
-    : 'Indisponivel';
+    ? (possuiVersao ? 'Disponível' : 'Pendente')
+    : 'Indisponível';
 
   return {
     ...item,
     descricaoSoftware: item.descricaoSoftware ?? '',
     versaoReferencia: item.versaoReferencia ?? '',
+    linkSoftware: item.linkSoftware ?? '',
     status,
     ultimaAtualizacao,
-    origemArquivo: 'Repositorio demo ATLAS',
+    origemArquivo: item.artefatoNome?.trim() || 'Base operacional ATLAS',
     observacao: item.descricaoSoftware?.trim()
       ? item.descricaoSoftware
-      : 'Arquivo utilizado na operacao e consolidado a partir da base atual de servicos.',
-    downloadDisponivel: status === 'Disponivel'
+      : 'Arquivo utilizado na operação e consolidado a partir da base atual de serviços.',
+    downloadDisponivel: Boolean(item.downloadDisponivel)
   };
 }

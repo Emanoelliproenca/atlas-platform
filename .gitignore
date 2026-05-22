@@ -37,4 +37,5 @@ frontend/dist/
 frontend/.angular/
 *.log
 .env
+.codex
 .codex/

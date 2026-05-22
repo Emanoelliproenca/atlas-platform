@@ -1,10 +1,12 @@
 import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { PainelFiltros } from '../painel-operacional-api';
 
 @Component({
   selector: 'app-filtros-operacionais',
-  imports: [FormsModule],
+  imports: [FormsModule, MatFormFieldModule, MatSelectModule],
   templateUrl: './filtros-operacionais.component.html',
   styleUrl: './filtros-operacionais.component.scss'
 })
