@@ -52,7 +52,16 @@
             </td>
             <td class="center-cell reading-cell">{{ ultimaAtualizacao() }}</td>
             <td class="center-cell action-cell">
-              <a class="action-button" [routerLink]="['/contratos', linha.contratoId]">Visualizar</a>
+              <a
+                mat-icon-button
+                class="action-button"
+                [routerLink]="['/contratos', linha.contratoId]"
+                matTooltip="Visualizar contrato"
+                title="Visualizar contrato"
+                aria-label="Visualizar contrato"
+              >
+                <app-action-icon name="visibility" />
+              </a>
             </td>
           </tr>
         } @empty {

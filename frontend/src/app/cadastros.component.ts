@@ -26,6 +26,7 @@ import {
   mapearServicoParaForm,
   resumirObservacao
 } from './cadastros.models';
+import { ActionIconComponent } from './components/action-icon.component';
 import {
   contarContratosAtivosPorServico,
   contarInativos,
@@ -59,7 +60,7 @@ const MENSAGEM_CARGA_ADMINISTRATIVA = 'Não foi possível carregar a base admini
 @Component({
   selector: 'app-cadastros',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatSelectModule, ActionIconComponent],
   templateUrl: './cadastros.component.html',
   styleUrl: './cadastros.component.scss'
 })

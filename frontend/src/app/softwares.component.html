@@ -204,15 +204,21 @@
               <td class="truncate-cell" [title]="item.origemArquivo">{{ item.origemArquivo }}</td>
               <td>
                 <div class="row-actions">
-                  <button type="button" class="table-action" (click)="selecionarSoftware(item.id)">Visualizar</button>
+                  <button type="button" mat-icon-button class="table-action" matTooltip="Visualizar sistema" title="Visualizar sistema" aria-label="Visualizar sistema" (click)="selecionarSoftware(item.id)">
+                    <app-action-icon name="visibility" />
+                  </button>
                   @if (ehAdmin()) {
-                    <button type="button" class="table-action ghost" (click)="editarSoftware(item)">Editar</button>
-                    <button type="button" class="table-action ghost" (click)="alternarSoftware(item)">
-                      {{ item.ativo ? 'Inativar' : 'Ativar' }}
+                    <button type="button" mat-icon-button class="table-action ghost" matTooltip="Editar sistema" title="Editar sistema" aria-label="Editar sistema" (click)="editarSoftware(item)">
+                      <app-action-icon name="edit" />
+                    </button>
+                    <button type="button" mat-icon-button class="table-action ghost" [attr.matTooltip]="item.ativo ? 'Inativar sistema' : 'Ativar sistema'" [title]="item.ativo ? 'Inativar sistema' : 'Ativar sistema'" [attr.aria-label]="item.ativo ? 'Inativar sistema' : 'Ativar sistema'" (click)="alternarSoftware(item)">
+                      <app-action-icon [name]="item.ativo ? 'toggle_off' : 'toggle_on'" />
                     </button>
                   }
                   @if (item.downloadDisponivel) {
-                    <button type="button" class="table-action ghost" (click)="baixarSoftware(item)">Baixar</button>
+                    <button type="button" mat-icon-button class="table-action ghost" matTooltip="Baixar artefato" title="Baixar artefato" aria-label="Baixar artefato" (click)="baixarSoftware(item)">
+                      <app-action-icon name="file_download" />
+                    </button>
                   }
                 </div>
               </td>

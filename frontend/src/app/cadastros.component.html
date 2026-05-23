@@ -140,14 +140,14 @@
                     <td class="col-status"><span class="status-badge" [class.inactive]="!item.ativo">{{ item.ativo ? 'Ativo' : 'Inativo' }}</span></td>
                     <td class="col-updated">{{ ultimaAtualizacaoFormatada() }}</td>
                     <td class="actions-cell col-actions">
-                      <button type="button" class="table-action" title="Visualizar contrato" aria-label="Visualizar contrato" (click)="abrirDrawerContrato('visualizar', item)">
-                        <span aria-hidden="true">◌</span>
+                      <button type="button" mat-icon-button class="table-action" matTooltip="Visualizar contrato" title="Visualizar contrato" aria-label="Visualizar contrato" (click)="abrirDrawerContrato('visualizar', item)">
+                        <app-action-icon name="visibility" />
                       </button>
-                      <button type="button" class="table-action" title="Editar contrato" aria-label="Editar contrato" (click)="abrirDrawerContrato('editar', item)">
-                        <span aria-hidden="true">✎</span>
+                      <button type="button" mat-icon-button class="table-action" matTooltip="Editar contrato" title="Editar contrato" aria-label="Editar contrato" (click)="abrirDrawerContrato('editar', item)">
+                        <app-action-icon name="edit" />
                       </button>
-                      <button type="button" class="table-action danger" [title]="item.ativo ? 'Inativar contrato' : 'Ativar contrato'" [attr.aria-label]="item.ativo ? 'Inativar contrato' : 'Ativar contrato'" (click)="alternarContrato(item)">
-                        <span aria-hidden="true">{{ item.ativo ? '−' : '+' }}</span>
+                      <button type="button" mat-icon-button class="table-action danger" [attr.matTooltip]="item.ativo ? 'Inativar contrato' : 'Ativar contrato'" [title]="item.ativo ? 'Inativar contrato' : 'Ativar contrato'" [attr.aria-label]="item.ativo ? 'Inativar contrato' : 'Ativar contrato'" (click)="alternarContrato(item)">
+                        <app-action-icon [name]="item.ativo ? 'toggle_off' : 'toggle_on'" />
                       </button>
                     </td>
                   </tr>
@@ -226,14 +226,14 @@
                     <td class="col-linked">{{ totalContratosPorServico(item.id) }}</td>
                     <td class="col-updated">{{ ultimaAtualizacaoFormatada() }}</td>
                     <td class="actions-cell col-actions">
-                      <button type="button" class="table-action" title="Visualizar serviço" aria-label="Visualizar serviço" (click)="abrirDrawerServico('visualizar', item)">
-                        <span aria-hidden="true">◌</span>
+                      <button type="button" mat-icon-button class="table-action" matTooltip="Visualizar serviço" title="Visualizar serviço" aria-label="Visualizar serviço" (click)="abrirDrawerServico('visualizar', item)">
+                        <app-action-icon name="visibility" />
                       </button>
-                      <button type="button" class="table-action" title="Editar serviço" aria-label="Editar serviço" (click)="abrirDrawerServico('editar', item)">
-                        <span aria-hidden="true">✎</span>
+                      <button type="button" mat-icon-button class="table-action" matTooltip="Editar serviço" title="Editar serviço" aria-label="Editar serviço" (click)="abrirDrawerServico('editar', item)">
+                        <app-action-icon name="edit" />
                       </button>
-                      <button type="button" class="table-action danger" [title]="item.ativo ? 'Inativar serviço' : 'Ativar serviço'" [attr.aria-label]="item.ativo ? 'Inativar serviço' : 'Ativar serviço'" (click)="alternarServico(item)">
-                        <span aria-hidden="true">{{ item.ativo ? '−' : '+' }}</span>
+                      <button type="button" mat-icon-button class="table-action danger" [attr.matTooltip]="item.ativo ? 'Inativar serviço' : 'Ativar serviço'" [title]="item.ativo ? 'Inativar serviço' : 'Ativar serviço'" [attr.aria-label]="item.ativo ? 'Inativar serviço' : 'Ativar serviço'" (click)="alternarServico(item)">
+                        <app-action-icon [name]="item.ativo ? 'toggle_off' : 'toggle_on'" />
                       </button>
                     </td>
                   </tr>
@@ -334,14 +334,14 @@
                     <td class="col-group truncate-cell" [title]="item.setor || '-'">{{ item.setor || '-' }}</td>
                     <td class="col-status"><span class="status-badge" [class.inactive]="!item.ativo">{{ item.ativo ? 'Ativo' : 'Inativo' }}</span></td>
                     <td class="actions-cell col-actions">
-                      <button type="button" class="table-action" title="Visualizar relacionamento" aria-label="Visualizar relacionamento" (click)="abrirDrawerRelacionamento('visualizar', item)">
-                        <span aria-hidden="true">◌</span>
+                      <button type="button" mat-icon-button class="table-action" matTooltip="Visualizar relacionamento" title="Visualizar relacionamento" aria-label="Visualizar relacionamento" (click)="abrirDrawerRelacionamento('visualizar', item)">
+                        <app-action-icon name="visibility" />
                       </button>
-                      <button type="button" class="table-action" title="Editar relacionamento" aria-label="Editar relacionamento" (click)="abrirDrawerRelacionamento('editar', item)">
-                        <span aria-hidden="true">✎</span>
+                      <button type="button" mat-icon-button class="table-action" matTooltip="Editar relacionamento" title="Editar relacionamento" aria-label="Editar relacionamento" (click)="abrirDrawerRelacionamento('editar', item)">
+                        <app-action-icon name="edit" />
                       </button>
-                      <button type="button" class="table-action danger" [title]="item.ativo ? 'Inativar relacionamento' : 'Ativar relacionamento'" [attr.aria-label]="item.ativo ? 'Inativar relacionamento' : 'Ativar relacionamento'" (click)="alternarRelacionamento(item)">
-                        <span aria-hidden="true">{{ item.ativo ? '−' : '+' }}</span>
+                      <button type="button" mat-icon-button class="table-action danger" [attr.matTooltip]="item.ativo ? 'Inativar relacionamento' : 'Ativar relacionamento'" [title]="item.ativo ? 'Inativar relacionamento' : 'Ativar relacionamento'" [attr.aria-label]="item.ativo ? 'Inativar relacionamento' : 'Ativar relacionamento'" (click)="alternarRelacionamento(item)">
+                        <app-action-icon [name]="item.ativo ? 'toggle_off' : 'toggle_on'" />
                       </button>
                     </td>
                   </tr>

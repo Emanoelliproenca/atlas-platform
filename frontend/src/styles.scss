@@ -13712,85 +13712,85 @@ app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operaciona
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional .table-wrapper {
   border: 1px solid rgba(184, 199, 188, 0.56) !important;
   border-radius: 14px !important;
+  max-width: 1120px !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional table {
-  min-width: 1040px !important;
-  table-layout: auto !important;
+  min-width: 860px !important;
+  table-layout: fixed !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional th:nth-child(1),
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional td:nth-child(1) {
-  width: 23% !important;
+  width: 27% !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional th:nth-child(2),
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional td:nth-child(2) {
-  width: 24% !important;
+  width: 25% !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional th:nth-child(3),
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional td:nth-child(3) {
-  width: 78px !important;
+  width: 72px !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional th:nth-child(4),
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional td:nth-child(4) {
-  width: 210px !important;
-  min-width: 210px !important;
+  width: 176px !important;
+  min-width: 176px !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional th:nth-child(5),
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional td:nth-child(5) {
-  width: 112px !important;
+  width: 98px !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional th:nth-child(6),
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional td:nth-child(6) {
-  width: 142px !important;
+  width: 128px !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional th:nth-child(7),
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional td:nth-child(7) {
-  width: 104px !important;
+  width: 68px !important;
+  text-align: right !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional th {
-  padding: 0.78rem 0.9rem !important;
+  padding: 0.7rem 0.58rem !important;
   background: #e7f0eb !important;
   color: #3f5148 !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional td {
-  padding: 0.86rem 0.9rem !important;
+  padding: 0.78rem 0.58rem !important;
   vertical-align: middle !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional .sector-cell {
   display: table-cell !important;
-  max-width: none !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
+  max-width: 176px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
   white-space: nowrap !important;
-  color: #52635a !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional .sector-label {
-  display: inline !important;
-  max-width: none !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
   white-space: nowrap !important;
-  word-break: normal !important;
-  overflow-wrap: normal !important;
 }
 
 app-root .atlas-theme:not(.login-mode) app-relacionamentos app-tabela-operacional .action-button {
-  min-height: 2rem !important;
-  padding: 0 0.78rem !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  min-height: 2.25rem !important;
+  padding: 0 !important;
   border-radius: 999px !important;
-  background: rgba(255, 255, 255, 0.8) !important;
-  box-shadow: none !important;
 }
 
 @media (max-width: 1180px) {
@@ -13859,6 +13859,7 @@ app-root .atlas-theme:not(.login-mode) app-softwares .summary-card {
   background: rgba(255, 255, 255, 0.74) !important;
   box-shadow: 0 12px 28px rgba(21, 40, 31, 0.055) !important;
 }
+
 
 app-root .atlas-theme:not(.login-mode) app-softwares .summary-card::before,
 app-root .atlas-theme:not(.login-mode) app-softwares .summary-card::after {

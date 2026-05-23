@@ -6,6 +6,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { finalize } from 'rxjs';
 import { ApiFeedbackService } from './api-feedback.service';
 import { AuthSessionService } from './auth-session.service';
+import { ActionIconComponent } from './components/action-icon.component';
 import { PainelOperacionalApi } from './painel-operacional-api';
 import { SoftwareViewModel, mapearSoftwareViewModel } from './softwares.models';
 
@@ -30,7 +31,7 @@ const SOFTWARE_FORM_VAZIO: SoftwareFormModel = {
 @Component({
   selector: 'app-softwares',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatSelectModule, ActionIconComponent],
   templateUrl: './softwares.component.html',
   styleUrl: './softwares.component.scss'
 })

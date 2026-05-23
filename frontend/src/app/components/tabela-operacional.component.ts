@@ -1,10 +1,11 @@
 import { Component, computed, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PainelLinha } from '../painel-operacional-api';
+import { ActionIconComponent } from './action-icon.component';
 
 @Component({
   selector: 'app-tabela-operacional',
-  imports: [RouterLink],
+  imports: [RouterLink, ActionIconComponent],
   templateUrl: './tabela-operacional.component.html',
   styleUrl: './tabela-operacional.component.scss'
 })

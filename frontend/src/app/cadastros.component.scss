@@ -177,7 +177,7 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.5rem;
-  padding: 0.52rem;
+  padding: 0.42rem;
   border: 1px solid rgba(216, 230, 220, 0.82);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.72);
@@ -195,8 +195,8 @@ h1 {
 .tab-button {
   display: grid;
   gap: 0.12rem;
-  min-height: 3rem;
-  padding: 0.62rem 0.78rem;
+  min-height: 2.86rem;
+  padding: 0.58rem 0.72rem;
   border: 1px solid transparent;
   border-radius: 14px;
   background: transparent;
@@ -263,6 +263,7 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .panel-top h2 {
@@ -459,7 +460,7 @@ textarea:disabled {
 
 table {
   width: 100%;
-  min-width: 1080px;
+  min-width: 1020px;
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
@@ -467,7 +468,7 @@ table {
 
 th,
 td {
-  padding: 0.62rem 0.72rem;
+  padding: 0.58rem 0.66rem;
   border-bottom: 1px solid #e6eee8;
   text-align: left;
   vertical-align: middle;
@@ -528,8 +529,8 @@ td {
 }
 
 .col-actions {
-  width: 220px;
-  min-width: 220px;
+  width: 176px;
+  min-width: 176px;
   text-align: center;
 }
 
@@ -578,14 +579,16 @@ td {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 0.35rem;
   white-space: nowrap;
 }
 
 .table-action {
-  min-height: 1.78rem;
-  min-width: 1.9rem;
-  padding: 0 0.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  min-height: 2.25rem;
+  min-width: 2.25rem;
+  padding: 0;
   border-radius: 999px;
   border: 1px solid rgba(216, 208, 194, 0.9);
   background: rgba(255, 255, 255, 0.7);
@@ -597,6 +600,11 @@ td {
     transform 150ms ease,
     background 150ms ease,
     border-color 150ms ease;
+}
+
+.empty-state .table-action {
+  width: auto;
+  padding: 0 0.8rem;
 }
 
 .table-action:hover {
@@ -719,6 +727,16 @@ td {
     padding: 0.9rem;
   }
 
+  table {
+    min-width: 900px;
+  }
+
+  .table-caption {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
   .accent-button,
   .primary-button,
   .ghost-button {
@@ -747,5 +765,12 @@ td {
 
   .actions-cell {
     flex-wrap: wrap;
+  }
+
+  .actions-cell .table-action {
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
   }
 }
