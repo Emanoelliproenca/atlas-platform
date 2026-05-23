@@ -39,3 +39,4 @@ frontend/.angular/
 .env
 .codex
 .codex/
+src/main/resources/application-local.properties
