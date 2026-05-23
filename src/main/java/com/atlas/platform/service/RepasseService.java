@@ -3,6 +3,7 @@ package com.atlas.platform.service;
 import com.atlas.platform.dto.RepasseRequest;
 import com.atlas.platform.dto.RepasseResponse;
 import com.atlas.platform.exception.ResourceNotFoundException;
+import com.atlas.platform.mapper.RepasseMapper;
 import com.atlas.platform.model.Repasse;
 import com.atlas.platform.repository.RepasseRepository;
 import com.atlas.platform.util.TextoUtils;
@@ -24,16 +25,18 @@ public class RepasseService {
 
     private final RepasseRepository repository;
     private final AuditoriaService auditoriaService;
+    private final RepasseMapper repasseMapper;
 
-    public RepasseService(RepasseRepository repository, AuditoriaService auditoriaService) {
+    public RepasseService(RepasseRepository repository, AuditoriaService auditoriaService, RepasseMapper repasseMapper) {
         this.repository = repository;
         this.auditoriaService = auditoriaService;
+        this.repasseMapper = repasseMapper;
     }
 
     public List<RepasseResponse> listarAtivos() {
         return repository.findByAtivoTrue().stream()
                 .sorted(ORDENACAO_REPASSES)
-                .map(this::toResponse)
+                .map(repasseMapper::toResponse)
                 .toList();
     }
 
@@ -50,7 +53,7 @@ public class RepasseService {
 
         Repasse salvo = repository.save(repasse);
         auditoriaService.registrar("REPASSE", salvo.getId(), "CREATE_REPASSE", "Repasse criado: " + salvo.getTitulo());
-        return toResponse(salvo);
+        return repasseMapper.toResponse(salvo);
     }
 
     @Transactional
@@ -65,7 +68,7 @@ public class RepasseService {
 
         Repasse salvo = repository.save(repasse);
         auditoriaService.registrar("REPASSE", salvo.getId(), "UPDATE_REPASSE", "Repasse atualizado: " + salvo.getTitulo());
-        return toResponse(salvo);
+        return repasseMapper.toResponse(salvo);
     }
 
     @Transactional
@@ -74,7 +77,7 @@ public class RepasseService {
         repasse.setAtivo(true);
         Repasse salvo = repository.save(repasse);
         auditoriaService.registrar("REPASSE", salvo.getId(), "ATIVACAO", "Repasse ativado: " + salvo.getTitulo());
-        return toResponse(salvo);
+        return repasseMapper.toResponse(salvo);
     }
 
     @Transactional
@@ -84,7 +87,7 @@ public class RepasseService {
         repasse.setFixado(false);
         Repasse salvo = repository.save(repasse);
         auditoriaService.registrar("REPASSE", salvo.getId(), "INATIVACAO", "Repasse inativado: " + salvo.getTitulo());
-        return toResponse(salvo);
+        return repasseMapper.toResponse(salvo);
     }
 
     @Transactional
@@ -99,7 +102,7 @@ public class RepasseService {
         repasse.setFixado(deveFixar);
         Repasse salvo = repository.save(repasse);
         auditoriaService.registrar("REPASSE", salvo.getId(), "FIXACAO", "Estado de fixação alterado: " + salvo.getTitulo());
-        return toResponse(salvo);
+        return repasseMapper.toResponse(salvo);
     }
 
     private Repasse buscarEntidadePorId(Long id) {
@@ -146,18 +149,4 @@ public class RepasseService {
         return valor.replaceAll("\\p{M}", "");
     }
 
-    private RepasseResponse toResponse(Repasse repasse) {
-        return new RepasseResponse(
-                repasse.getId(),
-                repasse.getTitulo(),
-                repasse.getCategoria(),
-                repasse.getConteudo(),
-                repasse.getPrioridade(),
-                repasse.getAtivo(),
-                repasse.getFixado(),
-                repasse.getAutor(),
-                repasse.getAnexoNome(),
-                repasse.getCriadoEm()
-        );
-    }
 }

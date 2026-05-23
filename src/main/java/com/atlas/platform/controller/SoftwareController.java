@@ -8,17 +8,14 @@ import com.atlas.platform.dto.SoftwareSyncResponse;
 import com.atlas.platform.model.SoftwareArtefato;
 import com.atlas.platform.response.ApiResponse;
 import com.atlas.platform.response.ApiResponses;
+import com.atlas.platform.service.ArquivoDownloadService;
 import com.atlas.platform.service.SoftwareArtefatoService;
 import com.atlas.platform.service.SoftwareConsultaService;
 import com.atlas.platform.service.SoftwareSincronizacaoService;
 import com.atlas.platform.service.ServicoService;
 import jakarta.validation.Valid;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,17 +36,20 @@ public class SoftwareController {
     private final SoftwareArtefatoService artefatoService;
     private final SoftwareSincronizacaoService sincronizacaoService;
     private final ServicoService servicoService;
+    private final ArquivoDownloadService arquivoDownloadService;
 
     public SoftwareController(
             SoftwareConsultaService service,
             SoftwareArtefatoService artefatoService,
             SoftwareSincronizacaoService sincronizacaoService,
-            ServicoService servicoService
+            ServicoService servicoService,
+            ArquivoDownloadService arquivoDownloadService
     ) {
         this.service = service;
         this.artefatoService = artefatoService;
         this.sincronizacaoService = sincronizacaoService;
         this.servicoService = servicoService;
+        this.arquivoDownloadService = arquivoDownloadService;
     }
 
     @GetMapping
@@ -102,14 +102,12 @@ public class SoftwareController {
     @GetMapping("/{servicoId}/download")
     public ResponseEntity<ByteArrayResource> baixarArtefato(@PathVariable Long servicoId) {
         SoftwareArtefato artefato = artefatoService.buscarArtefatoAtual(servicoId);
-        ContentDisposition disposition = ContentDisposition.attachment()
-                .filename(artefato.getNome(), StandardCharsets.UTF_8)
-                .build();
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(artefato.getTipoConteudo()))
-                .contentLength(artefato.getTamanho())
-                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
-                .body(new ByteArrayResource(artefato.getConteudo()));
+        return arquivoDownloadService.criarResposta(
+                artefato.getNome(),
+                artefato.getTipoConteudo(),
+                artefato.getTamanho(),
+                artefato.getConteudo(),
+                true
+        );
     }
 }

@@ -1,13 +1,11 @@
 package com.atlas.platform.service;
 
 import com.atlas.platform.dto.ContratoArquivoResponse;
-import com.atlas.platform.exception.BusinessException;
 import com.atlas.platform.exception.ResourceNotFoundException;
 import com.atlas.platform.model.Contrato;
 import com.atlas.platform.model.ContratoArquivo;
 import com.atlas.platform.repository.ContratoArquivoRepository;
 import com.atlas.platform.repository.ContratoRepository;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -18,20 +16,21 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly = true)
 public class ContratoArquivoService {
 
-    private static final String TIPO_CONTEUDO_PADRAO = "application/octet-stream";
-
     private final ContratoArquivoRepository repository;
     private final ContratoRepository contratoRepository;
     private final AuditoriaService auditoriaService;
+    private final ArquivoUploadService arquivoUploadService;
 
     public ContratoArquivoService(
             ContratoArquivoRepository repository,
             ContratoRepository contratoRepository,
-            AuditoriaService auditoriaService
+            AuditoriaService auditoriaService,
+            ArquivoUploadService arquivoUploadService
     ) {
         this.repository = repository;
         this.contratoRepository = contratoRepository;
         this.auditoriaService = auditoriaService;
+        this.arquivoUploadService = arquivoUploadService;
     }
 
     public List<ContratoArquivoResponse> listarPorContrato(Long contratoId) {
@@ -53,25 +52,22 @@ public class ContratoArquivoService {
 
     @Transactional
     public ContratoArquivoResponse salvar(Long contratoId, MultipartFile arquivo) {
-        if (arquivo == null || arquivo.isEmpty()) {
-            throw new BusinessException("Selecione um arquivo para enviar.");
-        }
-
         Contrato contrato = contratoRepository.findById(contratoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Contrato não encontrado com id: " + contratoId));
+        ArquivoUploadData upload = arquivoUploadService.preparar(
+                arquivo,
+                "arquivo",
+                "Selecione um arquivo para enviar.",
+                "Não foi possível ler o arquivo enviado."
+        );
 
         ContratoArquivo entidade = new ContratoArquivo();
         entidade.setContrato(contrato);
-        entidade.setNome(normalizarNome(arquivo.getOriginalFilename()));
-        entidade.setTipoConteudo(normalizarTipoConteudo(arquivo.getContentType()));
-        entidade.setTamanho(arquivo.getSize());
+        entidade.setNome(upload.nome());
+        entidade.setTipoConteudo(upload.tipoConteudo());
+        entidade.setTamanho(upload.tamanho());
         entidade.setCriadoEm(LocalDateTime.now());
-
-        try {
-            entidade.setConteudo(arquivo.getBytes());
-        } catch (IOException ex) {
-            throw new BusinessException("Não foi possível ler o arquivo enviado.");
-        }
+        entidade.setConteudo(upload.conteudo());
 
         ContratoArquivo salvo = repository.save(entidade);
         auditoriaService.registrar("CONTRATO_ARQUIVO", salvo.getId(), "FILE_UPLOAD",
@@ -89,18 +85,4 @@ public class ContratoArquivoService {
         );
     }
 
-    private String normalizarNome(String nome) {
-        String nomeNormalizado = nome == null ? "" : nome.trim();
-        if (nomeNormalizado.isBlank()) {
-            return "arquivo";
-        }
-
-        return nomeNormalizado.replaceAll("[\\\\/]+", "_");
-    }
-
-    private String normalizarTipoConteudo(String tipoConteudo) {
-        return tipoConteudo == null || tipoConteudo.isBlank()
-                ? TIPO_CONTEUDO_PADRAO
-                : tipoConteudo;
-    }
 }

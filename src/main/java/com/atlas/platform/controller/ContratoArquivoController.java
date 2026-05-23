@@ -4,15 +4,17 @@ import com.atlas.platform.dto.ContratoArquivoResponse;
 import com.atlas.platform.model.ContratoArquivo;
 import com.atlas.platform.response.ApiResponse;
 import com.atlas.platform.response.ApiResponses;
+import com.atlas.platform.service.ArquivoDownloadService;
 import com.atlas.platform.service.ContratoArquivoService;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -20,9 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class ContratoArquivoController {
 
     private final ContratoArquivoService service;
+    private final ArquivoDownloadService arquivoDownloadService;
 
-    public ContratoArquivoController(ContratoArquivoService service) {
+    public ContratoArquivoController(ContratoArquivoService service, ArquivoDownloadService arquivoDownloadService) {
         this.service = service;
+        this.arquivoDownloadService = arquivoDownloadService;
     }
 
     @GetMapping
@@ -49,14 +53,12 @@ public class ContratoArquivoController {
     }
 
     private ResponseEntity<ByteArrayResource> criarRespostaArquivo(ContratoArquivo arquivo, boolean download) {
-        ContentDisposition disposition = (download ? ContentDisposition.attachment() : ContentDisposition.inline())
-                .filename(arquivo.getNome(), StandardCharsets.UTF_8)
-                .build();
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(arquivo.getTipoConteudo()))
-                .contentLength(arquivo.getTamanho())
-                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
-                .body(new ByteArrayResource(arquivo.getConteudo()));
+        return arquivoDownloadService.criarResposta(
+                arquivo.getNome(),
+                arquivo.getTipoConteudo(),
+                arquivo.getTamanho(),
+                arquivo.getConteudo(),
+                download
+        );
     }
 }
