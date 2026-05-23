@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: atlas-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /swagger-ui.html
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod,seed
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
+      - key: APP_SECURITY_ADMIN_USERNAME
+        value: admin
+      - key: APP_SECURITY_ADMIN_PASSWORD
+        generateValue: true
+      - key: APP_SECURITY_VIEWER_USERNAME
+        value: viewer
+      - key: APP_SECURITY_VIEWER_PASSWORD
+        generateValue: true
+      - key: APP_SOFTWARE_SYNC_MANIFEST_URL
+        sync: false
+      - key: APP_CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: SPRINGDOC_SWAGGER_UI_ENABLED
+        value: "true"
+      - key: SPRINGDOC_API_DOCS_ENABLED
+        value: "true"
