@@ -4,6 +4,7 @@ import com.atlas.platform.dto.ImportacaoPlanilhaResponse;
 import com.atlas.platform.response.ApiResponse;
 import com.atlas.platform.response.ApiResponses;
 import com.atlas.platform.service.ImportacaoPlanilhaService;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +21,7 @@ public class ImportacaoController {
         this.service = service;
     }
 
-    @PostMapping("/planilha")
+    @PostMapping(value = "/planilha", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ImportacaoPlanilhaResponse> importarPlanilha(@RequestParam("arquivo") MultipartFile arquivo) {
         return ApiResponses.success("Planilha importada com sucesso", service.importar(arquivo));
     }

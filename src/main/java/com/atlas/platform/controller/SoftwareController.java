@@ -16,6 +16,7 @@ import com.atlas.platform.service.ServicoService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -90,7 +91,7 @@ public class SoftwareController {
         return ApiResponses.success("Artefatos do sistema carregados com sucesso", artefatoService.listarPorServico(servicoId));
     }
 
-    @PostMapping("/{servicoId}/artefatos")
+    @PostMapping(value = "/{servicoId}/artefatos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<SoftwareArtefatoResponse> uploadArtefato(
             @PathVariable Long servicoId,
             @RequestParam("arquivo") MultipartFile arquivo,

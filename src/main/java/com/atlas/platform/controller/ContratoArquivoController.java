@@ -8,6 +8,7 @@ import com.atlas.platform.service.ArquivoDownloadService;
 import com.atlas.platform.service.ContratoArquivoService;
 import java.util.List;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +35,7 @@ public class ContratoArquivoController {
         return ApiResponses.success("Arquivos do contrato carregados com sucesso", service.listarPorContrato(contratoId));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ContratoArquivoResponse> upload(
             @PathVariable Long contratoId,
             @RequestParam("arquivo") MultipartFile arquivo
