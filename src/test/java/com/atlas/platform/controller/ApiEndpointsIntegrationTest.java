@@ -102,6 +102,13 @@ class ApiEndpointsIntegrationTest {
     }
 
     @Test
+    void devePermitirAcessoPublicoAoOpenApi() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.openapi").exists());
+    }
+
+    @Test
     void deveRetornarSessaoDoUsuarioAutenticado() throws Exception {
         mockMvc.perform(get("/auth/me")
                         .header(HttpHeaders.AUTHORIZATION, visualizadorAuthorization))
