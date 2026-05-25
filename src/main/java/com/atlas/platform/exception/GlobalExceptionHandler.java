@@ -3,6 +3,8 @@ package com.atlas.platform.exception;
 import com.atlas.platform.response.ApiErrorResponse;
 import com.atlas.platform.response.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -14,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
@@ -55,6 +59,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
+        log.error(
+                "Erro interno tratado pelo GlobalExceptionHandler. method={}, uri={}, query={}, exceptionClass={}, exceptionMessage={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                request.getQueryString(),
+                ex.getClass().getName(),
+                ex.getMessage(),
+                ex
+        );
+
         return error(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno no servidor", request);
     }
 
